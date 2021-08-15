@@ -23,6 +23,7 @@ window.onload = function() {
 	//ispis_sinusoide();
 	
 	inicijalizirajDisplay(visina, sirina, 25);
+	var zvukBang = new Zvuk({file: "bang.wav", brOverlap: 5, volume:0.7});
 	
 	let poljeLopti = [];
 	
@@ -30,6 +31,8 @@ window.onload = function() {
 	poljeLopti.push(l);
 	l = new Lopta({size:2, vx:-110, vy:40, hMax:visMax2, x:330, y:100, g:700});
 	poljeLopti.push(l);
+	
+	let poljeEksplozija = [];
 	
 	//window.requestAnimationFrame(l.nacrtaj);
 	
@@ -69,11 +72,22 @@ window.onload = function() {
 		    if (obj.interakcijaOruzje(oruzje)) {
 				oruzje.ugasi();
 				console.log("pogodak!");	
+				zvukBang.sviraj();
+				
+				let dimenzije = obj.vratiPoziciju();
+				let an = new Animacija({sir: 2*dimenzije[2], vis: 2*dimenzije[2], x:dimenzije[0], y:dimenzije[1], vrijeme: 400});
+				an.aktiviraj();
+				poljeEksplozija.push(an);
+				
 				poljeLopti.push(...obj.reduciraj());
 				poljeLopti.splice(i, 1);
 			}
 		}
 		
+		for (let i = poljeEksplozija.length-1; i > -1; i--) {
+		    let obj = poljeEksplozija[i];
+		    if (!obj.nacrtaj())  poljeEksplozija.splice(i, 1);
+	    }
 	}, 20);
 	setTimeout(()=> {clearTimeout(idtimer)}, 30000);
     }
@@ -161,7 +175,7 @@ class Oruzje {
 		this.id = "oruzje";
 		this.el.id = this.id;
 		dodajStilove(this.el, {width: this.sirina + "px", height: this.pocetnaVisina + "px", position: "absolute",
-			                  bottom: "0px", display: "none", overflow: "hidden", backgroundColor: "white"});
+			                  bottom: "0px", display: "none", overflow: "hidden"});
 			                  
 	    this.slikaOruzja = document.createElement("div");
 	    dodajStilove(this.slikaOruzja, {width: "100%", height: visina + "px", backgroundImage: "url('slika_oruzja1.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain", opacity: "1", position: "absolute", top: "0px", left: "0px"});
@@ -391,6 +405,12 @@ class Lopta {
 		this.nacrtaj = this.nacrtaj.bind(this);
 		this.interakcijaOruzje= this.interakcijaOruzje.bind(this);
 		this.reduciraj = this.reduciraj.bind(this);
+		this.vratiPoziciju = this.vratiPoziciju.bind(this);
+	}
+	
+	vratiPoziciju() {
+		console.log("vracam " + this.radius);
+		return [this.x, this.y, this.radius];
 	}
 	
     interakcijaOruzje(oruzje) {
@@ -536,6 +556,101 @@ class Lopta {
 	}
     
 }
+
+class Animacija {
+	constructor({sir, vis=sir, x=sir/2, y=vis/2, vrijeme=1000}) {
+		this.sirina = sir;
+		this.visina = vis;
+		this.x = x;
+		this.y = y;
+		
+		this.spriteX = 0;
+		this.spriteY = 0;
+		
+		this.aktivnaSw = false;
+		this.time = null;
+		this.frame = 0;
+		this.timeFrame = vrijeme / 25;
+		
+		this.el = document.createElement("div");
+		dodajStilove(this.el, {height: this.visina + "px", width: this.sirina + "px", overflow: "hidden", position: "absolute",
+                               top: this.y - this.visina/2 + "px", left: this.x - this.sirina/2 + "px"});
+                               
+        this.sprite = document.createElement("div");
+		dodajStilove(this.sprite, {height: 500 + "%", width: 500 + "%", position: "absolute", backgroundImage: "url('pngegg.png')",
+                               backgroundSize: "cover", backgroundRepeat: "no-repeat", top: this.spriteY + "%", left: this.spriteX + "%"});
+        this.el.appendChild(this.sprite);
+                               
+                               
+        document.querySelector(".display").appendChild(this.el);
+        
+        this.postaviFrame = this.postaviFrame.bind(this);
+        this.aktiviraj = this.aktiviraj.bind(this);
+        this.nacrtaj = this.nacrtaj.bind(this);
+	}
+	
+	nacrtaj() {
+		if (this.aktivnaSw) {
+			let vrijeme = performance.now();
+			let nvfr = Math.floor((vrijeme-this.time)/this.timeFrame);
+			if (this.frame !== nvfr) {
+				this.frame = nvfr;
+				this.postaviFrame(this.frame);
+			}
+			if (nvfr >= 24) {
+				this.frame = 24;
+				this.aktivnaSw = false;
+				document.querySelector(".display").removeChild(this.el);
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	aktiviraj() {
+		if (!this.aktivnaSw) {
+			this.aktivnaSw = true;
+			this.time = performance.now();
+			this.frame = 0;
+		}
+	}
+	
+	postaviFrame(br) {
+		this.spriteY = Math.floor(br/5) % 5 * (-100);
+		this.spriteX = br % 5 * (-100);
+		dodajStilove(this.sprite, {top: this.spriteY + "%", left: this.spriteX + "%"});
+	}
+}
+
+class Zvuk {
+	constructor({file, brOverlap=1, volume=1}) {
+		this.count = 0;
+		this.br = brOverlap;
+		this.volume = this.logVolume(volume)/100;
+		 
+		this.polje = []
+		for (var i = 0; i < this.br; i++) {
+			let a = new Audio(file);
+			a.volume = this.volume;
+            this.polje.push(a);
+        }
+        
+        this.sviraj = this.sviraj.bind(this);
+	}
+	
+	sviraj() {
+		this.polje[this.count].play();
+		this.count = (this.count+1) % this.br;
+	}
+	
+	logVolume(x) {
+		if (x == 0) return 0;
+		return Math.exp(5.116 * (x-0.1));
+	}
+	
+}
+
 
 function idGenerator() {
     var br = 0;
