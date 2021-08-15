@@ -18,6 +18,8 @@ function ispis_sinusoide() {
 	}
 }
 
+let igr = null;  //  privremena debug konstrukcija
+
 
 window.onload = function() {
 	//ispis_sinusoide();
@@ -27,16 +29,16 @@ window.onload = function() {
 	
 	let poljeLopti = [];
 	
-	let l = new Lopta({size:1, vx:110, vy:0, hMax:visMax1, x:130, y:100, g:700});
+	let l = new Lopta({size:1, vx:110, vy:0, hMax:visMax1, x:130, y:100, g:0*700});
 	poljeLopti.push(l);
-	l = new Lopta({size:2, vx:-110, vy:40, hMax:visMax2, x:330, y:100, g:700});
+	l = new Lopta({size:2, vx:-110, vy:40, hMax:visMax2, x:330, y:100, g:0*700});
 	poljeLopti.push(l);
 	
 	let poljeEksplozija = [];
 	
 	//window.requestAnimationFrame(l.nacrtaj);
 	
-	let igr = new Igrac({vis: 110, sir: 70, x: 300, brzinaKretanja: 150});
+	igr = new Igrac({vis: 110, sir: 70, x: 300, brzinaKretanja: 150});
 	let oruzje = new Oruzje({sir: 30, brz: 300});
 	
 	let kontrole = new Kontrole({igracObjekt: igr, oruzjeObjekt: oruzje});
@@ -57,7 +59,9 @@ window.onload = function() {
     }
     
     if (false) {
-	var idtimer = setInterval(() => {igr.nacrtaj(); l.nacrtaj()}, 20);
+		
+	l = new Lopta({size:4, vx:-110, vy:40, hMax:visMax2, x:380, y:590, g:700});	
+	var idtimer = setInterval(() => {igr.nacrtaj(); if (l.interakcijaIgrac(igr))  alert("sudar");}, 20);
 	setTimeout(()=> {clearTimeout(idtimer)}, 30000);
     }
     
@@ -68,6 +72,9 @@ window.onload = function() {
 		
 		for (let i = poljeLopti.length-1; i > -1; i--) {
 			let obj = poljeLopti[i];
+			
+			if (obj.interakcijaIgrac(igr))  alert("sudar");
+			
 		    obj.nacrtaj();
 		    if (obj.interakcijaOruzje(oruzje)) {
 				oruzje.ugasi();
@@ -136,6 +143,14 @@ class Kontrole {
 			console.log("stisnuo si gumb S " + Math.random());
 			console.log("polozaj pucaljke je " + this.igracObjekt.vratiPolozajPucaljke());
 			this.oruzjeObjekt.pucaj(this.igracObjekt.vratiPolozajPucaljke());
+		}
+		
+		if (ev.code === "KeyQ") {
+			console.log("vraceni podaci " + igr.vratiPolozajGlave());
+		}
+		
+		if (ev.code === "KeyW") {
+			console.log("vraceni podaci " + igr.vratiPolozajTijela());
 		}
 		
 	}
@@ -250,19 +265,19 @@ class Igrac {
 		dodajStilove(this.el, {height: this.visina + "px", width: this.sirina + "px", position: "absolute", backgroundColor: "white",
 			                  bottom: "0px", left: (this.x - this.sirina/2) + "px"});
 			                  
-		var el1 = document.createElement("div");			
-		el1.id = "glava";
-		dodajStilove(el1, {height: 0.7*this.sirina + "px", width: 0.7*this.sirina + "px", backgroundColor: "#0596f0", position: "absolute",
+		this.glava = document.createElement("div");			
+		this.glava.id = "glava";
+		dodajStilove(this.glava, {height: 0.7*this.sirina + "px", width: 0.7*this.sirina + "px", backgroundColor: "#0596f0", position: "absolute",
 			                  top: 0.1*this.sirina + "px", left: 0.15*this.sirina + "px", borderRadius: "50%", zIndex: "5"});
-		this.el.appendChild(el1);
+		this.el.appendChild(this.glava);
 		
-		el1 = document.createElement("div");			
-		el1.id = "tijelo";
-		dodajStilove(el1, {height: 0.8*this.sirina + "px", width: 0.8*this.sirina + "px", backgroundColor: "blue", position: "absolute",
+		this.tijelo = document.createElement("div");			
+		this.tijelo.id = "tijelo";
+		dodajStilove(this.tijelo, {height: 0.8*this.sirina + "px", width: 0.8*this.sirina + "px", backgroundColor: "blue", position: "absolute",
 			                  top: 0.55*this.sirina + "px", left: 0.1*this.sirina + "px", zIndex: "4"});
-		this.el.appendChild(el1);
+		this.el.appendChild(this.tijelo);
 		
-		el1 = document.createElement("div");			
+		var el1 = document.createElement("div");			
 		el1.id = "noga1";
 		dodajStilove(el1, {height: 0.5*this.sirina + "px", width: 0.2*this.sirina + "px", backgroundColor: "#ecbcb4", position: "absolute",
 			                  bottom: "0px", left: 0.2*this.sirina + "px", zIndex: "3"});
@@ -287,6 +302,25 @@ class Igrac {
 		
 		this.nacrtaj = this.nacrtaj.bind(this);
 		this.vratiPolozajPucaljke = this.vratiPolozajPucaljke.bind(this);
+		
+		this.vratiPolozajGlave = this.vratiPolozajGlave.bind(this);
+	}
+	
+	vratiPolozajGlave() {   // vraca polje uredene trojke x, y, r, koordinate centra glave i radijusa glave
+		if (typeof this._glavaSirina === "undefined")  this._glavaSirina = parseFloat(this.glava.style.height);
+		if (typeof this._glavaTop === "undefined")   this._glavaTop = parseFloat(this.glava.style.top);
+		if (typeof this._glavaLeft === "undefined")  this._glavaLeft = parseFloat(this.glava.style.left);
+		
+		return [(this.el.offsetLeft + this._glavaLeft + this._glavaSirina/2), (this.el.offsetTop + this._glavaTop + this._glavaSirina/2), this._glavaSirina/2];
+	}
+	
+	vratiPolozajTijela() {  // vraca polje uredene cetvorke, x, y, sir, vis, koordinate centra pravokutnika, njegovu sirinu i visinu
+		if (typeof this._tijeloSirina === "undefined")  this._tijeloSirina = parseFloat(this.tijelo.style.width);
+		if (typeof this._tijeloVisina === "undefined")  this._tijeloVisina = parseFloat(this.tijelo.style.height);
+		if (typeof this._tijeloTop === "undefined")  this._tijeloTop = parseFloat(this.tijelo.style.top);
+		if (typeof this._tijeloLeft === "undefined")  this._tijeloLeft = parseFloat(this.tijelo.style.left);
+		
+		return [(this.el.offsetLeft + this._tijeloLeft + this._tijeloSirina/2), (this.el.offsetTop + this._tijeloTop + this._tijeloVisina/2), this._tijeloSirina, this._tijeloVisina];
 	}
 	
 	vratiPolozajPucaljke() {
@@ -404,6 +438,7 @@ class Lopta {
 		
 		this.nacrtaj = this.nacrtaj.bind(this);
 		this.interakcijaOruzje= this.interakcijaOruzje.bind(this);
+		this.interakcijaIgrac = this.interakcijaIgrac.bind(this);
 		this.reduciraj = this.reduciraj.bind(this);
 		this.vratiPoziciju = this.vratiPoziciju.bind(this);
 	}
@@ -411,6 +446,27 @@ class Lopta {
 	vratiPoziciju() {
 		console.log("vracam " + this.radius);
 		return [this.x, this.y, this.radius];
+	}
+	
+	interakcijaIgrac(igrac) {
+		var par = igrac.vratiPolozajGlave();
+		if ( (this.x-par[0])**2 + (this.y-par[1])**2 <= (this.radius+par[2])**2) return true;  // interakcija sa glavom
+		
+		par = igrac.vratiPolozajTijela();  // x, y, sir, vis
+		if (par[0] - par[2]/2 - this.radius > this.x  ||  par[0] + par[2]/2 + this.radius < this.x || 
+		    par[1] - par[3]/2 - this.radius > this.y  ||  par[1] + par[3]/2 + this.radius < this.y)  return false;
+		
+		// interakcija sa bridovima
+		if (par[0] - par[2]/2 < this.x  &&  par[0] + par[2]/2 > this.x)  return true;
+		if (par[1] - par[3]/2 < this.y  &&  par[1] + par[3]/2 > this.y)  return true;
+		
+		// interakcija sa rubovima
+		if (  (this.x - par[0] + par[2]/2)**2 + (this.y - par[1] + par[3]/2)**2 <= this.radius**2   ||   
+		      (this.x - par[0] - par[2]/2)**2 + (this.y - par[1] + par[3]/2)**2 <= this.radius**2   ||
+		      (this.x - par[0] + par[2]/2)**2 + (this.y - par[1] - par[3]/2)**2 <= this.radius**2   ||
+		      (this.x - par[0] - par[2]/2)**2 + (this.y - par[1] - par[3]/2)**2 <= this.radius**2 )  return true;
+		
+		return false;
 	}
 	
     interakcijaOruzje(oruzje) {
