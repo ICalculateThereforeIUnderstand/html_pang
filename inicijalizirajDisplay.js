@@ -73,7 +73,17 @@ function inicijalizirajDisplay(visina, sirina, sirinaOkvira) {
 	el5.classList.add("display");
 	dodajStilove(el5, {height: visina+"px", width: sirina + "px", backgroundColor: bojaDisplaya,
 		              position: "absolute", top: sirinaOkvira + "px", left: sirinaOkvira + "px"});
-	el.appendChild(el5);
+		              
+    let el6 = document.createElement("div");
+    el6.id = "poruka";
+    let el7 = document.createElement("p");
+    el7.id = "poruka-tekst";
+    el7.innerHTML = "Last 1s.";
+    el6.appendChild(el7);
+    
+    el5.appendChild(el6);  // message window stavljamo na display
+         
+	el.appendChild(el5);  //  display stavljamo na ekran
 	
 	root.appendChild(el);
 }

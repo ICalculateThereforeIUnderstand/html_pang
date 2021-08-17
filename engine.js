@@ -18,33 +18,47 @@ function ispis_sinusoide() {
 	}
 }
 
-let igr = null;  //  privremena debug konstrukcija
+//let igr = null;  //  privremena debug konstrukcija
 
-
+var pauzaSw = [false];  //  za true su objekti na displayu zamrznuti   
+var pauza = null;    //  privremena debug konstrukcija 
+ 
 window.onload = function() {
 	//ispis_sinusoide();
 	
 	inicijalizirajDisplay(visina, sirina, 25);
 	var zvukBang = new Zvuk({file: "bang.wav", brOverlap: 5, volume:0.7});
+	pauza = new Pauza();
+	
+	//var pauzaSw = false;  //  za true su objekti na displayu zamrznuti
+	
+	//pauziraj(4000, [pauzaSw]);
 	
 	let poljeLopti = [];
 	
-	let l = new Lopta({size:1, vx:110, vy:0, hMax:visMax1, x:130, y:100, g:0*700});
+	//let l = new Lopta({size:4, vx:110, vy:0, hMax:visMax1, x:130, y:100, g:1*700, xPoc: 200, inicSw: false});
+	//poljeLopti.push(l);
+	
+	ubacujLopte(poljeLopti, pauzaSw);
+	
+	if (false) {
+	let l = new Lopta({size:1, vx:110, vy:0, hMax:visMax1, x:130, y:100, g:1*700});
 	poljeLopti.push(l);
-	l = new Lopta({size:2, vx:-110, vy:40, hMax:visMax2, x:330, y:100, g:0*700});
+	l = new Lopta({size:2, vx:-110, vy:40, hMax:visMax2, x:330, y:100, g:1*700});
 	poljeLopti.push(l);
+    }
 	
 	let poljeEksplozija = [];
 	
 	//window.requestAnimationFrame(l.nacrtaj);
 	
-	igr = new Igrac({vis: 110, sir: 70, x: 300, brzinaKretanja: 150});
-	let oruzje = new Oruzje({sir: 30, brz: 300});
+	let igr = new Igrac({vis: 110, sir: 70, x: 300, brzinaKretanja: 150});
+	let oruzje = [new Oruzje({sir: 30, brz: 300}), new Oruzje({sir: 30, brz: 300})];
 	
 	let kontrole = new Kontrole({igracObjekt: igr, oruzjeObjekt: oruzje});
 	
 	if (false) {
-	var idtimer = setInterval(oruzje.nacrtaj, 50);
+	var idtimer = setInterval(oruzje[0].nacrtaj, 50);
 	setTimeout(()=> {clearTimeout(idtimer)}, 30000);
     }
 	
@@ -68,27 +82,35 @@ window.onload = function() {
     if (true) {
 	var idtimer = setInterval(() => {
 		igr.nacrtaj(); 
-		oruzje.nacrtaj();
+		oruzje[0].nacrtaj();
+		oruzje[1].nacrtaj();
+		
+		let treperenjeStatus = pauza.treperenjeSw();
 		
 		for (let i = poljeLopti.length-1; i > -1; i--) {
 			let obj = poljeLopti[i];
 			
-			if (obj.interakcijaIgrac(igr))  alert("sudar");
+			if (!pauzaSw[0] && obj.interakcijaIgrac(igr))  alert("sudar");
 			
-		    obj.nacrtaj();
-		    if (obj.interakcijaOruzje(oruzje)) {
-				oruzje.ugasi();
-				console.log("pogodak!");	
-				zvukBang.sviraj();
+		    obj.nacrtaj(treperenjeStatus);
+		    
+		    for (let j = 0; j < 2; j++) {
+		        if (obj.interakcijaOruzje(oruzje[j])) {
+					if (obj.ucinak == 1)  pauza.dodajVrijeme(2000); //pauziraj(2000, pauzaSw);
+				    oruzje[j].ugasi();
+				    console.log("pogodak!");	
+				    zvukBang.sviraj();
 				
-				let dimenzije = obj.vratiPoziciju();
-				let an = new Animacija({sir: 2*dimenzije[2], vis: 2*dimenzije[2], x:dimenzije[0], y:dimenzije[1], vrijeme: 400});
-				an.aktiviraj();
-				poljeEksplozija.push(an);
+				    let dimenzije = obj.vratiPoziciju();
+				    let an = new Animacija({sir: 2*dimenzije[2], vis: 2*dimenzije[2], x:dimenzije[0], y:dimenzije[1], vrijeme: 400});
+				    an.aktiviraj();
+				    poljeEksplozija.push(an);
 				
-				poljeLopti.push(...obj.reduciraj());
-				poljeLopti.splice(i, 1);
-			}
+				    poljeLopti.push(...obj.reduciraj());
+				    poljeLopti.splice(i, 1);
+				    break;
+			    }
+		    }
 		}
 		
 		for (let i = poljeEksplozija.length-1; i > -1; i--) {
@@ -96,9 +118,77 @@ window.onload = function() {
 		    if (!obj.nacrtaj())  poljeEksplozija.splice(i, 1);
 	    }
 	}, 20);
-	setTimeout(()=> {clearTimeout(idtimer)}, 30000);
+	setTimeout(()=> {clearTimeout(idtimer)}, 600000);
     }
 }
+
+
+class Pauza {
+	constructor() {
+		this.vrijeme = 0;
+		this.ref = null;
+		this.tim = performance.now();
+		
+		this.dodajVrijeme = this.dodajVrijeme.bind(this);
+		this.refreshaj = this.refreshaj.bind(this);
+		this.treperenjeSw = this.treperenjeSw.bind(this);
+	}
+	
+	treperenjeSw() {
+		if (!pauzaSw[0]) return false;
+		if ( Math.floor((performance.now()-this.tim) /150) % 2 === 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	dodajVrijeme(time) {
+		this.vrijeme += time;
+		console.log("Novo vrijeme je " + this.vrijeme);
+		pauzaSw[0] = true;
+		clearTimeout(this.ref);
+		this.refreshaj();
+	}
+	
+	refreshaj() {
+		
+		if (this.vrijeme <= -1000) {
+			this.vrijeme = 0;
+			pauzaSw[0] = false;
+		    dodajStilove(document.querySelector("#poruka"), {display: "none"});
+		} else {
+			dodajStilove(document.querySelector("#poruka"), {display: "block"});
+		    document.querySelector("#poruka-tekst").innerHTML = "Last " + Math.floor(this.vrijeme/1000) + "s.";
+		    this.vrijeme -= 1000;
+			
+			this.ref = setTimeout(()=> {this.refreshaj()}, 1000);
+		}
+	}
+}
+
+
+
+function ubacujLopte(poljeLopti, pauzaSw) {
+	let loptaTip = Math.floor(Math.random()*3)+1;
+	console.log("Upravo inicijaliziramo loptu tip " + loptaTip);
+	let l = new Lopta({size:loptaTip, vx:110 * (Math.floor(Math.random()*2) - 0.5)*2, vy:0, hMax:tip(loptaTip), x:130, y:100, g:1*700, xPoc: Math.floor(Math.random()*700 +100), inicSw: true});
+	poljeLopti.push(l);
+	setTimeout(() => {ubacujLopte(poljeLopti)}, 6000);
+	
+	function tip(ltip) {
+		switch (ltip) {
+			case (1):
+			    return visMax1;
+			case (2):
+			    return visMax2;
+			case (3):
+			    return visMax3;
+		}
+		return visMax4;
+	}
+}
+
 
 class Kontrole {
 	constructor({igracObjekt, oruzjeObjekt}) {
@@ -126,14 +216,14 @@ class Kontrole {
 				        this.keyDown = "ArrowLeft";
 				        //console.log("na pritisak je " + this.igracObjekt);
 				        this.igracObjekt.smjerKretanja = "l";
-				        console.log("Stisnuo si Lijevu strelicu " + Math.random());
+				        //console.log("Stisnuo si Lijevu strelicu " + Math.random());
 				    }
 				    break;
 				case ("ArrowRight"):
 				    if (this.keyDown !== "ArrowRight") {
 				        this.keyDown = "ArrowRight";
 				        this.igracObjekt.smjerKretanja = "d";
-				        console.log("Stisnuo si desnu strelicu " + Math.random());
+				        //console.log("Stisnuo si desnu strelicu " + Math.random());
 				    }
 				    break;	
 			}
@@ -141,8 +231,12 @@ class Kontrole {
 		
 		if (ev.code === "KeyS") {
 			console.log("stisnuo si gumb S " + Math.random());
-			console.log("polozaj pucaljke je " + this.igracObjekt.vratiPolozajPucaljke());
-			this.oruzjeObjekt.pucaj(this.igracObjekt.vratiPolozajPucaljke());
+			//console.log("polozaj pucaljke je " + this.igracObjekt.vratiPolozajPucaljke());
+			if (this.oruzjeObjekt[0].aktivnoSw) {
+			    this.oruzjeObjekt[1].pucaj(this.igracObjekt.vratiPolozajPucaljke());
+			} else {
+				this.oruzjeObjekt[0].pucaj(this.igracObjekt.vratiPolozajPucaljke());
+			}
 		}
 		
 		if (ev.code === "KeyQ") {
@@ -153,6 +247,11 @@ class Kontrole {
 			console.log("vraceni podaci " + igr.vratiPolozajTijela());
 		}
 		
+		if (ev.code === "KeyP") {
+			pauza.dodajVrijeme(4000);
+			console.log("pauzaSw prekidac je " + pauzaSw[0]);
+		}
+		
 	}
 	
 	pritisakGumbaUp(ev) {	
@@ -161,14 +260,14 @@ class Kontrole {
 			    if (this.keyDown == "ArrowLeft") {
 				    this.keyDown = false;
 				    this.igracObjekt.smjerKretanja = null;
-				    console.log("Otpustio si lijevu strelicu " + Math.random());
+				    //console.log("Otpustio si lijevu strelicu " + Math.random());
 			    }
 				break;
 			case ("ArrowRight"):
 			    if (this.keyDown == "ArrowRight") {
 				    this.keyDown = false;
 				    this.igracObjekt.smjerKretanja = null;
-				    console.log("Otpustio si desnu strelicu " + Math.random());
+				    //console.log("Otpustio si desnu strelicu " + Math.random());
 			    }
 				break;	
 		}
@@ -187,8 +286,8 @@ class Oruzje {
 		this.x = null;
 		this.y = null;
 		this.el = document.createElement("div");			
-		this.id = "oruzje";
-		this.el.id = this.id;
+		//this.id = "oruzje";
+		//this.el.id = this.id;
 		dodajStilove(this.el, {width: this.sirina + "px", height: this.pocetnaVisina + "px", position: "absolute",
 			                  bottom: "0px", display: "none", overflow: "hidden"});
 			                  
@@ -372,16 +471,16 @@ class Igrac {
 class Lopta {
 	// konstruktor lopte. size je velicina lopte 1-4, vx/vy su komponente brzina, x/y su koordinate pocetne pozicije lopte
 	// g je opcijski parametar gravitacije, a hMax je max. visina loptice, ona efektivno zadaje energiju lopte, znaci od donjeg brida/poda do donje strane loptice u njezinoj najvisoj poziciji
-	constructor({size, vx, vy, hMax, x, y, g=700}) {
+	// za inicSw inicijaliziramo loptu sa vrha displaya, za false je samo postavljamo na ekran. xPoc kod inicijalizacije zadaje x koordinatu lopte
+	// ucinak opcija za 0 proizvodi klasicnu standardnu loptu, za 1 proizvodi treperujucu loptu koja kod ponistanje pauzira igru na odredeno vrijeme.
+	constructor({size, vx, vy, hMax, x, y, g=700, xPoc, inicSw=false, ucinak=0}) {
 		this.size = size;
 		
 		this.vx = vx;
 		this.vy = vy;
 		this.g = g;
-		console.log("g je " + g);
+		this.ucinak = ucinak;
 		
-		this.x = x;
-		this.y = y;
 		this.time = null; //performance.now();
 		//console.log("vrijeme je postavljeno na " + this.time);
 		
@@ -403,8 +502,21 @@ class Lopta {
 			    this.radius = 20;
 		}
 		console.log("radijus je " + this.radius);
+		
+		this.inicSw = inicSw;
+		this.inicBr = 0;
+		if (this.inicSw) {
+		    this.x = xPoc;
+		    //this.y = 30;
+		    this.inicijalizacijskaFaza();
+		} else {
+			this.x = x;
+		    this.y = y;
+		}
+		
+		
 		this.hMax = hMax; //- this.radius;
-		this.hMax1 = visina - this.y - this.radius  +  (this.vy)**2 / 2 / this.g; 
+        this.hMax1 = visina - this.y - this.radius  +  (this.vy)**2 / 2 / this.g; 
 		
 		this.termalizacija = 0;
 		if (false) {  // za true termaliziramo loptu odmah prilikom inicijalizacije, lopta dobija zadanu energiju
@@ -432,8 +544,14 @@ class Lopta {
 		this.el = document.createElement("div");			
 		this.id = "id" + this.newId;
 		this.el.id = this.id;
-		dodajStilove(this.el, {height: 2*this.radius + "px", width: 2*this.radius + "px", borderRadius: "50%", backgroundColor: "red", position: "absolute",
-			                  top: (this.y - this.radius) + "px", left: (this.x - this.radius) + "px"});
+		
+		if (inicSw) {
+			this.boja = "#a60303";
+		} else {
+			this.boja = "red";
+		}
+		dodajStilove(this.el, {height: 2*this.radius + "px", width: 2*this.radius + "px", borderRadius: "50%", backgroundColor: this.boja, position: "absolute",
+			                  top: (this.y - this.radius) + "px", left: (this.x - this.radius) + "px", zIndex: 6});
 		document.querySelector(".display").appendChild(this.el);
 		
 		this.nacrtaj = this.nacrtaj.bind(this);
@@ -441,6 +559,26 @@ class Lopta {
 		this.interakcijaIgrac = this.interakcijaIgrac.bind(this);
 		this.reduciraj = this.reduciraj.bind(this);
 		this.vratiPoziciju = this.vratiPoziciju.bind(this);
+		this.inicijalizacijskaFaza = this.inicijalizacijskaFaza.bind(this);
+	}
+	
+	inicijalizacijskaFaza() {
+		var yPozicije = [[-1*this.radius, -0.5*this.radius, 0*this.radius, 0.5*this.radius, this.radius],[],[],[]];
+		this.y = yPozicije[0][this.inicBr];
+		//console.log("y je " + this.y);
+		if (pauzaSw[0]) {
+			setTimeout(() => {this.inicijalizacijskaFaza()}, 1500);
+			return true;
+		}
+		this.inicBr++;
+		if (this.inicBr >= 5) {
+			this.inicSw = false;
+			this.hMax1 = visina - this.y - this.radius  +  (this.vy)**2 / 2 / this.g; 
+			this.boja = "red";
+			dodajStilove(this.el, {backgroundColor: this.boja});
+		} else {
+			setTimeout(() => {this.inicijalizacijskaFaza()}, 1500);
+		}
 	}
 	
 	vratiPoziciju() {
@@ -470,7 +608,7 @@ class Lopta {
 	}
 	
     interakcijaOruzje(oruzje) {
-		if (oruzje.aktivnoSw  &&  this.radius + this.y >= visina - oruzje.y) {
+		if (!this.inicSw  &&  oruzje.aktivnoSw  &&  this.radius + this.y >= visina - oruzje.y) {
 			if (this.y > visina - oruzje.y) {   // interakcija sa konopom
 			    var tt = this.radius + oruzje.sirina/2;
 		        if (this.x >= oruzje.x - tt   &&   this.x <= oruzje.x + tt)  return true;	
@@ -497,9 +635,18 @@ class Lopta {
 			    rez.push(l);
 			    break;
 			case (3):
-			    l = new Lopta({size:4, vx:-1*Math.abs(this.vx), vy:pocetnaVy, hMax:visMax4, x:this.x-this.radius/2, y:this.y, g:this.g});
+			    let ucinci = [0,0];
+			    if (Math.random() < 0.4) {
+					if (Math.random() < 0.5) {
+						ucinci = [0,1];
+					} else {
+						ucinci = [1,0];
+					}
+				}
+				console.log("ucinak je " + ucinci);
+			    l = new Lopta({size:4, vx:-1*Math.abs(this.vx), vy:pocetnaVy, hMax:visMax4, x:this.x-this.radius/2, y:this.y, g:this.g, ucinak: ucinci[0]});
 	            rez.push(l);
-	            l = new Lopta({size:4, vx:Math.abs(this.vx), vy:pocetnaVy, hMax:visMax4, x:this.x+this.radius/2, y:this.y, g:this.g});
+	            l = new Lopta({size:4, vx:Math.abs(this.vx), vy:pocetnaVy, hMax:visMax4, x:this.x+this.radius/2, y:this.y, g:this.g, ucinak: ucinci[1]});
 			    rez.push(l);
 			    break;
 			case (4):
@@ -513,15 +660,27 @@ class Lopta {
 		
 	}
     	
-	nacrtaj() {
+	nacrtaj(treperenjeStatus=false) {
+	  if (treperenjeStatus) {
+		  var disp = "none";
+	  } else {
+		  var disp = "block";
+	  }	
+		
+	  if (this.inicSw) {
+		dodajStilove(this.el, {top: (this.y-this.radius) + "px", left: (this.x-this.radius) + "px", display: disp});  
+	  } else {	
 		var vrijeme = performance.now();
 		if (this.time === null) {
 			var dt = 0;
 			this.time = vrijeme;
+			this.pocetnoVrijeme = vrijeme;
 		} else {
 			var dt = vrijeme - this.time;
 			this.time = vrijeme;
 		}
+		
+		if (pauzaSw[0])  dt = 0;
 		
 		//console.log("vy " + this.vy);
 		
@@ -545,25 +704,7 @@ class Lopta {
 		
 		var noviY = this.y + this.vy * dt/1000;
 		
-		if (this.vy < 0) {
-		    /*if (noviY - this.radius < 0) {
-			    let dt1 = -1 * (this.radius - noviY) / this.vy * 1000;
-			    //let dt2 = -1 * (this.x - this.radius) / this.vx;
-			    let dt2 = dt - dt1;
-			
-			    noviY = this.y + dt2/1000 * this.vy + dt1/1000 * (-1) * this.vy;
-			    this.vy *= -1;
-		    } else if (noviY + this.radius > visina) {
-			    //console.log("noviX/radius/sirina:" + noviX + " / " + this.radius + " / " + sirina);
-			    let dt1 = (noviY + this.radius - visina) / this.vy * 1000;
-			    let dt2 = dt - dt1;
-			    noviY = this.y + dt2/1000 * this.vy + dt1/1000 * (-1) * this.vy;
-			    this.vy *= -1;
-		    }*/
-		    
-		    //let vMax = Math.sqrt(2*this.hMax*this.g);
-			//let vMax1 = Math.sqrt(2*this.hMax1*this.g);
-			
+		if (this.vy < 0) {			
 			if (this.hMax1 > visina - 2*this.radius) {
 				
 			    let vMax1 = Math.sqrt(2*(this.hMax1-visina+2*this.radius)*this.g);
@@ -601,14 +742,19 @@ class Lopta {
 				this.hMax1 = this.hMax;
 			}
 			
-		}
-		
-		
+		}	
 		
 		this.x = noviX;
 		this.y = noviY;
 		
-		dodajStilove(this.el, {top: (noviY-this.radius) + "px", left: (noviX-this.radius) + "px"});
+		if (this.ucinak === 1  &&  Math.floor( (this.time - this.pocetnoVrijeme) / 100) % 2 == 1  ) {
+			this.boja = "#f7cdcd";
+		} else {
+			this.boja = "red";
+		}   
+		
+		dodajStilove(this.el, {top: (noviY-this.radius) + "px", left: (noviX-this.radius) + "px", backgroundColor: this.boja, display: disp});
+	  }	
 	}
     
 }
@@ -630,7 +776,7 @@ class Animacija {
 		
 		this.el = document.createElement("div");
 		dodajStilove(this.el, {height: this.visina + "px", width: this.sirina + "px", overflow: "hidden", position: "absolute",
-                               top: this.y - this.visina/2 + "px", left: this.x - this.sirina/2 + "px"});
+                               top: this.y - this.visina/2 + "px", left: this.x - this.sirina/2 + "px", zIndex: "7"});
                                
         this.sprite = document.createElement("div");
 		dodajStilove(this.sprite, {height: 500 + "%", width: 500 + "%", position: "absolute", backgroundImage: "url('pngegg.png')",
