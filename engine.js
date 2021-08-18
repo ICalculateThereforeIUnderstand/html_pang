@@ -172,7 +172,8 @@ class Pauza {
 function ubacujLopte(poljeLopti, pauzaSw) {
 	let loptaTip = Math.floor(Math.random()*3)+1;
 	console.log("Upravo inicijaliziramo loptu tip " + loptaTip);
-	let l = new Lopta({size:loptaTip, vx:110 * (Math.floor(Math.random()*2) - 0.5)*2, vy:0, hMax:tip(loptaTip), x:130, y:100, g:1*700, xPoc: Math.floor(Math.random()*700 +100), inicSw: true});
+	let l = new Lopta({size:loptaTip, vx:110 * (Math.floor(Math.random()*2) - 0.5)*2, vy:170, hMax:tip(loptaTip), x:130, y:100, g:1*700, xPoc: Math.floor(Math.random()*700 +100), inicSw: true, sesterokutSw: true, ucinak: 0}); 
+	//let l = new Lopta({size:loptaTip, vx:110 * (Math.floor(Math.random()*2) - 0.5)*2, vy:150, hMax:tip(loptaTip), x:130, y:100, g:1*700, xPoc: Math.floor(Math.random()*700 +100), inicSw: true, sesterokutSw: false, ucinak: 0});  // obrisi ucinak
 	poljeLopti.push(l);
 	setTimeout(() => {ubacujLopte(poljeLopti)}, 6000);
 	
@@ -473,16 +474,18 @@ class Lopta {
 	// g je opcijski parametar gravitacije, a hMax je max. visina loptice, ona efektivno zadaje energiju lopte, znaci od donjeg brida/poda do donje strane loptice u njezinoj najvisoj poziciji
 	// za inicSw inicijaliziramo loptu sa vrha displaya, za false je samo postavljamo na ekran. xPoc kod inicijalizacije zadaje x koordinatu lopte
 	// ucinak opcija za 0 proizvodi klasicnu standardnu loptu, za 1 proizvodi treperujucu loptu koja kod ponistanje pauzira igru na odredeno vrijeme.
-	constructor({size, vx, vy, hMax, x, y, g=700, xPoc, inicSw=false, ucinak=0}) {
+	constructor({size, vx, vy, hMax, x, y, g=700, xPoc, inicSw=false, ucinak=0, sesterokutSw=false}) {
 		this.size = size;
 		
 		this.vx = vx;
 		this.vy = vy;
 		this.g = g;
 		this.ucinak = ucinak;
+		this.sesterokutSw = sesterokutSw;
 		
 		this.time = null; //performance.now();
 		//console.log("vrijeme je postavljeno na " + this.time);
+		this.pocetnoVrijeme = performance.now();
 		
 		switch (this.size) {
 			case (1):
@@ -507,7 +510,7 @@ class Lopta {
 		this.inicBr = 0;
 		if (this.inicSw) {
 		    this.x = xPoc;
-		    //this.y = 30;
+		    if (this.sesterokutSw)  this.y = y;
 		    this.inicijalizacijskaFaza();
 		} else {
 			this.x = x;
@@ -551,7 +554,36 @@ class Lopta {
 			this.boja = "red";
 		}
 		dodajStilove(this.el, {height: 2*this.radius + "px", width: 2*this.radius + "px", borderRadius: "50%", backgroundColor: this.boja, position: "absolute",
-			                  top: (this.y - this.radius) + "px", left: (this.x - this.radius) + "px", zIndex: 6});
+			                  top: (this.y - this.radius) + "px", left: (this.x - this.radius) + "px", zIndex: "6"});
+	    
+	    if (this.sesterokutSw) {
+			this.el1 = document.createElement("div");
+			dodajStilove(this.el1, {backgroundImage: "url('sesterokut3.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain", position: "absolute", top: "0px", left: "0px", height: "100%", width: "100%"});
+			this.el.appendChild(this.el1);
+			
+			this.el2 = document.createElement("div");
+			dodajStilove(this.el2, {backgroundImage: "url('sesterokut2.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain", position: "absolute", top: "0px", left: "0px", height: "100%", width: "100%"});
+			this.el.appendChild(this.el2);
+			
+			this.el3 = document.createElement("div");
+			dodajStilove(this.el3, {backgroundImage: "url('sesterokut1a.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain", position: "absolute", top: "0px", left: "0px", height: "100%", width: "100%"});
+			this.el.appendChild(this.el3);
+			
+			if (inicSw) {
+			    dodajStilove(this.el1, {display: "none"});
+			    dodajStilove(this.el2, {display: "block"});	
+			    dodajStilove(this.el3, {display: "none"});	
+			} else {
+				dodajStilove(this.el1, {display: "block"});
+			    dodajStilove(this.el2, {display: "none"});
+			    dodajStilove(this.el3, {display: "none"});	
+			}
+			
+			dodajStilove(this.el, {backgroundColor: null, transform: "rotate(" + this.vratiKut() + "deg)"});
+		}
+	    
+	    
+	    
 		document.querySelector(".display").appendChild(this.el);
 		
 		this.nacrtaj = this.nacrtaj.bind(this);
@@ -560,6 +592,15 @@ class Lopta {
 		this.reduciraj = this.reduciraj.bind(this);
 		this.vratiPoziciju = this.vratiPoziciju.bind(this);
 		this.inicijalizacijskaFaza = this.inicijalizacijskaFaza.bind(this);
+		this.vratiKut = this.vratiKut.bind(this);
+	}
+	
+	vratiKut() {
+		if (this.sesterokutSw) {
+			return  (  Math.floor( (performance.now() - this.pocetnoVrijeme)/1000 * 360) % 360 );
+		} else {
+			return 0;
+		}
 	}
 	
 	inicijalizacijskaFaza() {
@@ -574,8 +615,8 @@ class Lopta {
 		if (this.inicBr >= 5) {
 			this.inicSw = false;
 			this.hMax1 = visina - this.y - this.radius  +  (this.vy)**2 / 2 / this.g; 
-			this.boja = "red";
-			dodajStilove(this.el, {backgroundColor: this.boja});
+			//this.boja = "red";
+			//dodajStilove(this.el, {backgroundColor: this.boja});
 		} else {
 			setTimeout(() => {this.inicijalizacijskaFaza()}, 1500);
 		}
@@ -623,15 +664,15 @@ class Lopta {
 		let rez = []; let l = null;
 		switch (this.size) {
 			case (1):
-			    l = new Lopta({size:2, vx:-1*Math.abs(this.vx), vy:pocetnaVy, hMax:visMax2, x:this.x-this.radius/2, y:this.y, g:this.g});
+			    l = new Lopta({size:2, vx:-1*Math.abs(this.vx), vy: this.sesterokutSw ? -1*Math.abs(this.vy) : pocetnaVy, hMax:visMax2, x:this.x-this.radius/2, y:this.y, g:this.g, sesterokutSw:this.sesterokutSw});
 	            rez.push(l);
-	            l = new Lopta({size:2, vx:Math.abs(this.vx), vy:pocetnaVy, hMax:visMax2, x:this.x+this.radius/2, y:this.y, g:this.g});
+	            l = new Lopta({size:2, vx:Math.abs(this.vx), vy: this.sesterokutSw ? -1*Math.abs(this.vy) : pocetnaVy, hMax:visMax2, x:this.x+this.radius/2, y:this.y, g:this.g, sesterokutSw:this.sesterokutSw});
 			    rez.push(l);
 			    break;
 			case (2):
-			    l = new Lopta({size:3, vx:-1*Math.abs(this.vx), vy:pocetnaVy, hMax:visMax3, x:this.x-this.radius/2, y:this.y, g:this.g});
+			    l = new Lopta({size:3, vx:-1*Math.abs(this.vx), vy: this.sesterokutSw ? -1*Math.abs(this.vy) : pocetnaVy, hMax:visMax3, x:this.x-this.radius/2, y:this.y, g:this.g, sesterokutSw:this.sesterokutSw});
 	            rez.push(l);
-	            l = new Lopta({size:3, vx:Math.abs(this.vx), vy:pocetnaVy, hMax:visMax3, x:this.x+this.radius/2, y:this.y, g:this.g});
+	            l = new Lopta({size:3, vx:Math.abs(this.vx), vy: this.sesterokutSw ? -1*Math.abs(this.vy) : pocetnaVy, hMax:visMax3, x:this.x+this.radius/2, y:this.y, g:this.g, sesterokutSw:this.sesterokutSw});
 			    rez.push(l);
 			    break;
 			case (3):
@@ -643,10 +684,9 @@ class Lopta {
 						ucinci = [1,0];
 					}
 				}
-				console.log("ucinak je " + ucinci);
-			    l = new Lopta({size:4, vx:-1*Math.abs(this.vx), vy:pocetnaVy, hMax:visMax4, x:this.x-this.radius/2, y:this.y, g:this.g, ucinak: ucinci[0]});
+			    l = new Lopta({size:4, vx:-1*Math.abs(this.vx), vy: this.sesterokutSw ? -1*Math.abs(this.vy) : pocetnaVy, hMax:visMax4, x:this.x-this.radius/2, y:this.y, g:this.g, ucinak: ucinci[0], sesterokutSw:this.sesterokutSw});
 	            rez.push(l);
-	            l = new Lopta({size:4, vx:Math.abs(this.vx), vy:pocetnaVy, hMax:visMax4, x:this.x+this.radius/2, y:this.y, g:this.g, ucinak: ucinci[1]});
+	            l = new Lopta({size:4, vx:Math.abs(this.vx), vy: this.sesterokutSw ? -1*Math.abs(this.vy) : pocetnaVy, hMax:visMax4, x:this.x+this.radius/2, y:this.y, g:this.g, ucinak: ucinci[1], sesterokutSw:this.sesterokutSw});
 			    rez.push(l);
 			    break;
 			case (4):
@@ -668,13 +708,13 @@ class Lopta {
 	  }	
 		
 	  if (this.inicSw) {
-		dodajStilove(this.el, {top: (this.y-this.radius) + "px", left: (this.x-this.radius) + "px", display: disp});  
+		dodajStilove(this.el, {top: (this.y-this.radius) + "px", left: (this.x-this.radius) + "px", display: disp, transform: "rotate(" + this.vratiKut() + "deg)"});  
 	  } else {	
 		var vrijeme = performance.now();
 		if (this.time === null) {
 			var dt = 0;
 			this.time = vrijeme;
-			this.pocetnoVrijeme = vrijeme;
+			//this.pocetnoVrijeme = vrijeme;
 		} else {
 			var dt = vrijeme - this.time;
 			this.time = vrijeme;
@@ -689,13 +729,11 @@ class Lopta {
 		
 		if (noviX - this.radius < 0) {
 			let dt1 = -1 * (this.radius - noviX) / this.vx * 1000;
-			//let dt2 = -1 * (this.x - this.radius) / this.vx;
 			let dt2 = dt - dt1;
 			
 			noviX = this.x + dt2/1000 * this.vx + dt1/1000 * (-1) * this.vx;
 			this.vx *= -1;
 		} else if (noviX + this.radius > sirina) {
-			//console.log("noviX/radius/sirina:" + noviX + " / " + this.radius + " / " + sirina);
 			let dt1 = (noviX + this.radius - sirina) / this.vx * 1000;
 			let dt2 = dt - dt1;
 			noviX = this.x + dt2/1000 * this.vx + dt1/1000 * (-1) * this.vx;
@@ -704,56 +742,84 @@ class Lopta {
 		
 		var noviY = this.y + this.vy * dt/1000;
 		
-		if (this.vy < 0) {			
-			if (this.hMax1 > visina - 2*this.radius) {
+		if (this.sesterokutSw) {
+		    if (noviY - this.radius < 0) {
+			    let dt1 = -1 * (this.radius - noviY) / this.vy * 1000;
+			    let dt2 = dt - dt1;
+			
+			    noviY = this.y + dt2/1000 * this.vy + dt1/1000 * (-1) * this.vy;
+			    this.vy *= -1;
+		    } else if (noviY + this.radius > visina) {
+			    let dt1 = (noviY + this.radius - visina) / this.vy * 1000;
+			    let dt2 = dt - dt1;
+			    noviY = this.y + dt2/1000 * this.vy + dt1/1000 * (-1) * this.vy;
+			    this.vy *= -1;
+		    }
+	    } else {
+		    if (this.vy < 0) {			
+			    if (this.hMax1 > visina - 2*this.radius) {
 				
-			    let vMax1 = Math.sqrt(2*(this.hMax1-visina+2*this.radius)*this.g);
-			    let dt1 = (-1*vMax1 - this.vy) / this.g * 1000;
+			        let vMax1 = Math.sqrt(2*(this.hMax1-visina+2*this.radius)*this.g);
+			        let dt1 = (-1*vMax1 - this.vy) / this.g * 1000;
 			    
+			        if (dt1 > dt) {
+				        noviY = this.y + this.vy*dt/1000 + this.g/2 * (dt/1000)**2;
+				        this.vy = this.vy + this.g * dt / 1000;
+			        } else {
+				        let dt2 = dt - dt1;
+				
+				        noviY = this.radius + vMax1 * dt2 / 1000 + this.g/2* (dt2/1000)**2;
+				        this.vy = vMax1 + this.g/2* dt2/1000;
+			        }
+			     
+			    } else {
+			        noviY = this.y + this.vy*dt/1000 + this.g/2 * (dt/1000)**2;
+		            this.vy = this.vy + this.g * dt / 1000;	
+			    }
+		    
+	        } else {
+			
+			    let vMax = Math.sqrt(2*this.hMax*this.g);
+			    let vMax1 = Math.sqrt(2*this.hMax1*this.g);
+			    let dt1 = (vMax1 - this.vy) / this.g * 1000;
+			
 			    if (dt1 > dt) {
 				    noviY = this.y + this.vy*dt/1000 + this.g/2 * (dt/1000)**2;
 				    this.vy = this.vy + this.g * dt / 1000;
 			    } else {
 				    let dt2 = dt - dt1;
 				
-				    noviY = this.radius + vMax1 * dt2 / 1000 + this.g/2* (dt2/1000)**2;
-				    this.vy = vMax1 + this.g/2* dt2/1000;
+				    noviY = visina - this.radius - vMax * dt2 / 1000 + this.g/2* (dt2/1000)**2;
+				    this.vy = -1*vMax + this.g/2* dt2/1000;
+				    this.hMax1 = this.hMax;
 			    }
-			     
-			} else {
-			    noviY = this.y + this.vy*dt/1000 + this.g/2 * (dt/1000)**2;
-		        this.vy = this.vy + this.g * dt / 1000;	
-			}
-		    
-	    } else {
 			
-			let vMax = Math.sqrt(2*this.hMax*this.g);
-			let vMax1 = Math.sqrt(2*this.hMax1*this.g);
-			let dt1 = (vMax1 - this.vy) / this.g * 1000;
-			
-			if (dt1 > dt) {
-				noviY = this.y + this.vy*dt/1000 + this.g/2 * (dt/1000)**2;
-				this.vy = this.vy + this.g * dt / 1000;
-			} else {
-				let dt2 = dt - dt1;
-				
-				noviY = visina - this.radius - vMax * dt2 / 1000 + this.g/2* (dt2/1000)**2;
-				this.vy = -1*vMax + this.g/2* dt2/1000;
-				this.hMax1 = this.hMax;
-			}
-			
-		}	
+		    }	
+		}  //  if sesterokutSw petlja
 		
 		this.x = noviX;
 		this.y = noviY;
 		
-		if (this.ucinak === 1  &&  Math.floor( (this.time - this.pocetnoVrijeme) / 100) % 2 == 1  ) {
-			this.boja = "#f7cdcd";
+		if (this.sesterokutSw) {
+			this.boja = null;
+			dodajStilove(this.el2, {display: "none"});
+			if (this.ucinak === 1  &&  Math.floor( (this.time - this.pocetnoVrijeme) / 100) % 2 == 1  ) {
+				dodajStilove(this.el1, {display: "none"});	
+			    dodajStilove(this.el3, {display: "block"});	
+			} else {
+			    dodajStilove(this.el1, {display: "block"});	
+			    dodajStilove(this.el3, {display: "none"});	
+			}
 		} else {
-			this.boja = "red";
-		}   
+			if (this.ucinak === 1  &&  Math.floor( (this.time - this.pocetnoVrijeme) / 100) % 2 == 1  ) {
+			    this.boja = "#f7cdcd";
+		    } else {
+			    this.boja = "red";
+		    } 
+		}
 		
-		dodajStilove(this.el, {top: (noviY-this.radius) + "px", left: (noviX-this.radius) + "px", backgroundColor: this.boja, display: disp});
+		dodajStilove(this.el, {top: (noviY-this.radius) + "px", left: (noviX-this.radius) + "px", backgroundColor: this.boja, 
+			                   display: disp, transform: "rotate(" + this.vratiKut() + "deg)"});
 	  }	
 	}
     
