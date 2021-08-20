@@ -9,7 +9,7 @@ function inicijalizirajDisplay(visina, sirina, sirinaOkvira) {
 	let root = document.querySelector("#root");
 	let el = document.createElement("div");
 	dodajStilove(el, {height: (visina+sirinaOkvira*2)+"px", width: (sirina+sirinaOkvira*2)+"px", backgroundColor:"red",
-		              position: "relative"});
+		              position: "relative", margin: "0px auto 0px auto"});
 	
 	
 	let el1 = document.createElement("div");
@@ -76,16 +76,34 @@ function inicijalizirajDisplay(visina, sirina, sirinaOkvira) {
 		              
     let el6 = document.createElement("div");
     el6.id = "poruka";
+    dodajStilove(el6, {height: "100px", width: "200px", position: "absolute", top: "250px", left: "350px", display: "flex", alignItems: "center", justifyContent: "center", zIndex: "9", display: "none"});
     let el7 = document.createElement("p");
     el7.id = "poruka-tekst";
+    dodajStilove(el7, {fontFamily: "sans-serif", fontSize: "30px", fontWidth: "600", color: "#36eb1e"});
     el7.innerHTML = "Last 1s.";
     el6.appendChild(el7);
     
     el5.appendChild(el6);  // message window stavljamo na display
+    
+    let el8 = document.createElement("div");
+    el8.id = "poruka1";
+    dodajStilove(el8, {height: "100px", width: "400px", position: "absolute", top: "250px", left: "250px", display: "flex", alignItems: "center", justifyContent: "center", zIndex: "9"});
+    let el9 = document.createElement("p");
+    dodajStilove(el9, {fontFamily: "sans-serif", fontSize: "40px", fontWidth: "600", color: "#11d6f0"});
+    el9.id = "poruka1-tekst";
+    el9.innerHTML = "CLICK TO START";
+    el8.appendChild(el9);
+    
+    el5.appendChild(el8);  // message window stavljamo na display
          
 	el.appendChild(el5);  //  display stavljamo na ekran
 	
 	root.appendChild(el);
+	
+	let indikatori = document.createElement("div");
+	indikatori.id = "indikatori";
+	dodajStilove(indikatori, {height: "200px", width: (sirina + 2*sirinaOkvira) + "px", margin: "0px auto 0px auto"});
+	root.appendChild(indikatori);
 }
 
 function setCigla(visina) {
