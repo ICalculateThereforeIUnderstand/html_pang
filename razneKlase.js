@@ -28,6 +28,7 @@ export class LeteciBroj {
         
         this.aktiviraj = this.aktiviraj.bind(this);
         this.nacrtaj = this.nacrtaj.bind(this);
+        this.unisti = this.unisti.bind(this);
     }
     
     aktiviraj() {
@@ -57,6 +58,10 @@ export class LeteciBroj {
 			return true;
 		}
 		return false;
+	}
+	
+	unisti() {
+		document.querySelector(".display").removeChild(this.el);
 	}
 }
 
@@ -91,6 +96,7 @@ export class Animacija {
         this.postaviFrame = this.postaviFrame.bind(this);
         this.aktiviraj = this.aktiviraj.bind(this);
         this.nacrtaj = this.nacrtaj.bind(this);
+        this.unisti = this.unisti.bind(this);
 	}
 	
 	nacrtaj() {
@@ -125,6 +131,10 @@ export class Animacija {
 		this.spriteX = br % 5 * (-100);
 		dodajStilove(this.sprite, {top: this.spriteY + "%", left: this.spriteX + "%"});
 	}
+	
+	unisti() {
+		document.querySelector(".display").removeChild(this.el);
+	}
 }
 
 export class Zvuk {
@@ -143,6 +153,12 @@ export class Zvuk {
         }
         
         this.sviraj = this.sviraj.bind(this);
+        this.ugasi = this.ugasi.bind(this);
+	}
+	
+	ugasi() {
+		this.polje[this.count-1].pause();
+        this.polje[this.count-1].currentTime = 0;
 	}
 	
 	sviraj() {
