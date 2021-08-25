@@ -157,14 +157,14 @@ export class Zvuk {
 	}
 	
 	ugasi() {
-		this.polje[this.count-1].pause();
-        this.polje[this.count-1].currentTime = 0;
+		this.polje[this.count].pause();
+        this.polje[this.count].currentTime = 0;
 	}
 	
 	sviraj() {
 		this.pokrenutoSw = true;
-		this.polje[this.count].play();
 		this.count = (this.count+1) % this.br;
+		this.polje[this.count].play();
 	}
 	
 	logVolume(x) {
@@ -172,6 +172,77 @@ export class Zvuk {
 		return Math.exp(5.116 * (x-0.1));
 	}
 	
+}
+
+export class StartajIgru {
+	constructor(engin, muzika) {
+		
+		this.muzika = muzika;
+		this.engine = engin;
+		this.brojac = 0;
+		this.el = document.querySelector("#poruka1");
+		
+		this.startaj = this.startaj.bind(this);
+		this.klikZaStart = this.klikZaStart.bind(this);
+		this.proces = this.proces.bind(this);
+		this.gameOver = this.gameOver.bind(this);
+	}
+	
+	proces(prviStartSw=true) {
+		console.log("procesiram " + this.brojac);
+		if (this.brojac === 0) {
+			this.brojac++;
+			setTimeout( ()=> {console.log("1procesiram " + this.brojac); this.proces(prviStartSw)}, 1000);
+		} else if (this.brojac < 11) {
+			if (this.brojac % 2 == 0) {
+				dodajStilove(this.el, {display: "none"});
+			} else {
+				dodajStilove(this.el, {display: "flex"});
+			}
+			this.brojac++;
+			setTimeout( ()=> {console.log("1procesiram " + this.brojac); this.proces(prviStartSw)}, 250);
+		} else {
+			this.muzika.sviraj();
+	        if (prviStartSw) {
+				//engine();
+				this.engine.engine();
+			} else {
+				this.engine.iteracije();
+			}
+		}
+	}
+	
+	startaj() {
+		document.querySelector(".display").addEventListener("click", this.klikZaStart);
+		this.brojac = 0;
+	}
+	
+	klikZaStart() {
+	    document.querySelector(".display").removeEventListener("click", this.klikZaStart);
+	    
+	    document.querySelector("#poruka1-tekst").innerHTML = "READY";
+	    this.proces();
+	    /*muzika.sviraj();
+	    engine();*/
+    }
+    
+    startajPonovo() {
+		this.brojac = 0;
+		document.querySelector("#poruka1-tekst").innerHTML = "READY";
+	    this.proces(false);
+	}
+	
+	gameOver() {
+		document.querySelector("#poruka1-tekst").innerHTML = "GAME OVER";
+		dodajStilove(this.el, {display: "flex"});
+		setTimeout(()=>{
+			//dodajStilove(this.el, {display: "none"});
+			document.querySelector("#poruka1-tekst").innerHTML = "CLICK TO START";
+			this.startaj();
+			
+			}, 3000);
+	}
+
 }
 
 function dodajStilove(el, stilovi) {
