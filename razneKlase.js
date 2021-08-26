@@ -189,7 +189,7 @@ export class StartajIgru {
 	}
 	
 	proces(prviStartSw=true) {
-		console.log("procesiram " + this.brojac);
+		//console.log("procesiram " + this.brojac);
 		if (this.brojac === 0) {
 			this.brojac++;
 			setTimeout( ()=> {console.log("1procesiram " + this.brojac); this.proces(prviStartSw)}, 1000);
@@ -200,7 +200,7 @@ export class StartajIgru {
 				dodajStilove(this.el, {display: "flex"});
 			}
 			this.brojac++;
-			setTimeout( ()=> {console.log("1procesiram " + this.brojac); this.proces(prviStartSw)}, 250);
+			setTimeout( ()=> {/*console.log("1procesiram " + this.brojac);*/ this.proces(prviStartSw)}, 250);
 		} else {
 			this.muzika.sviraj();
 	        if (prviStartSw) {

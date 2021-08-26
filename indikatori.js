@@ -7,6 +7,7 @@ class Indikatori {
 		this.bodovi = bodovi;
 		this.level = level;
 		this.progres = progres;
+		this.padajuciElement = null;
 		
 		var fontProperties = {fontFamily: "sans-serif", fontSize: "40px", fontWeight: "600", color: bojaSlova, lineHeight: "0"};
 		
@@ -71,6 +72,7 @@ class Indikatori {
 		this.setBodovi = this.setBodovi.bind(this);
 		this.setLevel = this.setLevel.bind(this);
 		this.setProgres = this.setProgres.bind(this);
+		this.izgubioZivot = this.izgubioZivot.bind(this);
 		
 		this.setLives(this.lives, true);
 		this.setBodovi(this.bodovi, true);
@@ -100,6 +102,13 @@ class Indikatori {
 	    }
 	}
 	
+	izgubioZivot() {
+		if (this.lives !== 0) {
+			dodajStilove(this.padajuciElement, {transform: "rotateX(90deg)", transformOrigin: "50% 95% 0px"});
+			setTimeout(()=>{this.setLives(this.lives-1); console.log("postavljen je novi display")}, 2000);
+		}
+	}
+	
 	setLives(br=3, sw=false) {
 		if (br !== this.lives || sw) {
 		    this.lives = br;
@@ -110,17 +119,27 @@ class Indikatori {
 		
 		    if (this.lives <= 5) {
 		        for (let i = 0; i < this.lives; i++) {
-			        let el = document.createElement("div");
-			        dodajStilove(el, {height: "100%", width: 0.6666*this.indikatorLives.clientHeight +"px",
-				                   backgroundImage: "url('puca_prema_gore.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain"});
-			        this.indikatorLives.appendChild(el);
+					if (i !== this.lives-1) {
+			            let el = document.createElement("div");
+			            dodajStilove(el, {height: "100%", width: 0.6666*this.indikatorLives.clientHeight +"px",
+				                       backgroundImage: "url('puca_prema_gore.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain"});
+			            this.indikatorLives.appendChild(el);
+			        } else {
+						this.padajuciElement = document.createElement("div");
+						dodajStilove(this.padajuciElement, {height: "100%", width: 0.6666*this.indikatorLives.clientHeight +"px",
+				                       backgroundImage: "url('puca_prema_gore.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain",
+				                       transition: "transform 0.7s ease-in"});
+			            this.indikatorLives.appendChild(this.padajuciElement);
+					}
 		        } 
 		    } else {
-			    let el = document.createElement("div");
-			    dodajStilove(el, {height: "100%", width: 0.6666*this.indikatorLives.clientHeight +"px",
-				                   backgroundImage: "url('puca_prema_gore.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain"});
-			    this.indikatorLives.appendChild(el);
-			    el = document.createElement("p");
+			    //let el = document.createElement("div");
+			    this.padajuciElement = document.createElement("div");
+			    dodajStilove(this.padajuciElement, {height: "100%", width: 0.6666*this.indikatorLives.clientHeight +"px",
+				                   backgroundImage: "url('puca_prema_gore.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain",
+				                   transition: "transform 0.7s ease-in"});
+			    this.indikatorLives.appendChild(this.padajuciElement);
+			    let el = document.createElement("p");
 		        el.innerHTML = "X " + this.lives;
 		        dodajStilove(el, {fontFamily: "sans-serif", fontSize: "40px", fontWeight: "600", color: "#11d6f0", lineHeight: "0"});
 		        this.indikatorLives.appendChild(el);

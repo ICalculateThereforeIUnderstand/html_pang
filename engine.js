@@ -63,7 +63,7 @@ class Engine {
 	engine() {
 		this.engineAktivanSw = true;
 	    this.bodovi = 0;
-	    this.brLives = 1;
+	    this.brLives = 8;
 	    this.progres = 0;
 	    this.level = 1;
 	    this.zadnjaPonistena = -1;
@@ -109,7 +109,8 @@ class Engine {
 					muzika.ugasi();
 					this.igr.izgubioZivot(obj);
 					this.brLives--;
-					this.indikatori.setLives(this.brLives);
+					//this.indikatori.setLives(this.brLives);
+					this.indikatori.izgubioZivot();
 					
 					setTimeout(() => { 
 					    this.zvukLostLife.sviraj();
