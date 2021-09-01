@@ -751,7 +751,7 @@ class Lopta {
 	}
 	
 	inicijalizacijskaFaza() {
-		var yPozicije = [[-1*this.radius, -0.5*this.radius, 0*this.radius, 0.5*this.radius, this.radius],[],[],[]];
+		var yPozicije = [[-1*this.radius, -0.5*this.radius, 0*this.radius, 0.5*this.radius, this.radius+1],[],[],[]];
 		this.y = yPozicije[0][this.inicBr];
 		//console.log("y je " + this.y);
 		if (pauzaSw[0]) {
@@ -957,8 +957,10 @@ class Lopta {
 		    }	
 		}  //  if sesterokutSw petlja
 		
-		this.x = noviX;
-		this.y = noviY;
+		if (noviX >= this.radius && noviX <= sirina - this.radius)  this.x = noviX;
+		if (noviY >= this.radius && noviY <= visina - this.radius)  this.y = noviY;
+		//this.x = noviX
+		//this.y = noviY;
 		
 		if (this.sesterokutSw) {
 			this.boja = null;
@@ -980,7 +982,7 @@ class Lopta {
 		
 		if (this.ucinak > 1)  this.boja = null;
 		
-		dodajStilove(this.el, {top: (noviY-this.radius) + "px", left: (noviX-this.radius) + "px", backgroundColor: this.boja, 
+		dodajStilove(this.el, {top: (this.y-this.radius) + "px", left: (this.x-this.radius) + "px", backgroundColor: this.boja, 
 			                   display: disp, transform: "rotate(" + this.vratiKut() + "deg)"});
 	  }	
 	}
