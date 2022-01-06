@@ -449,7 +449,7 @@ class Igrac {
 			                  
         this.sprite = document.createElement("img"); 
 	    dodajStilove(this.sprite, {position: "absolute", height: "800%", width: "300%",
-			                    top: "5%", left: "0%", zIndex: "6"});
+			                    top: "16%", left: "0%", zIndex: "6"});
 	    this.sprite.setAttribute("src", "sprite.png");
 	    this.el.appendChild(this.sprite);
 	    
@@ -577,9 +577,9 @@ class Igrac {
 		}
 		
 		if (this.smjerKretanja !== null) {
-			if (false && this.smjerKretanja !== this.smjerKretanjaPrethodni) {
+			if (this.smjerKretanja !== this.smjerKretanjaPrethodni) {
 			    this.smjerKretanjaPrethodni = this.smjerKretanja;
-			    this.pocFrame = 0;
+			    //this.pocFrame = 0;
 		    }
 			
 		    var noviX = this.x;
@@ -595,7 +595,7 @@ class Igrac {
 			    if (this.x !== noviX) {
 					this.x = noviX;
 			        dodajStilove(this.el, {left: (this.x - this.sirina/2) + "px"});
-			        dodajStilove(this.sprite, {top: -1*Math.floor(this.frame/3)*100 - 300 + 5 + "%", left: -1*(this.frame%3)*100 + "%"});
+			        dodajStilove(this.sprite, {top: -1*Math.floor(this.frame/3)*100 - 300 + 16 + "%", left: -1*(this.frame%3)*100 - 7 + "%"});
 				}
 			 
 		    } else if (this.smjerKretanja === "d") {
@@ -610,12 +610,17 @@ class Igrac {
 			    if (this.x !== noviX) {
 					this.x = noviX;
 			        dodajStilove(this.el, {left: (this.x - this.sirina/2) + "px"});
-			        dodajStilove(this.sprite, {top: -1*Math.floor(this.frame/3)*100 + 5 + "%", left: -1*(this.frame%3)*100 + "%"});
+			        dodajStilove(this.sprite, {top: -1*Math.floor(this.frame/3)*100 + 16 + "%", left: -1*(this.frame%3)*100 + 7 + "%"});
 				}   
 		    }
 	    } else {  // this.smjerKretanja == null, resetiramo pocetno vrijeme animacije
 			this.pocetnoVrijemeAnim = vrijeme;
 			this.pocFrame = this.frame;
+			if (this.smjerKretanjaPrethodni === "l") {
+			    dodajStilove(this.sprite, {top: -600 + 16 + "%", left: "8%"});
+			} else {
+				dodajStilove(this.sprite, {top: -600 + 16 + "%", left: "-108%"});
+			}
 		}
 	  }  
 	}

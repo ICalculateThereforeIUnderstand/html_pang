@@ -121,14 +121,33 @@ class Indikatori {
 		        for (let i = 0; i < this.lives; i++) {
 					if (i !== this.lives-1) {
 			            let el = document.createElement("div");
-			            dodajStilove(el, {height: "100%", width: 0.6666*this.indikatorLives.clientHeight +"px",
-				                       backgroundImage: "url('puca_prema_gore.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain"});
+			            dodajStilove(el, {height: "100%", width: 0.6666*this.indikatorLives.clientHeight +"px", position: "relative", overflow: "hidden"});
+				        
+				        
+				        let spr = document.createElement("img"); 
+				        el.appendChild(spr);
+	                    dodajStilove(spr, {position: "absolute", height: "800%", width: "300%",
+			                                       top: "16%", left: "0%", zIndex: "10"});
+	                    spr.setAttribute("src", "sprite.png");
+	                    
+				        
+				        console.log("trebao bi vidjeti ikonu..." + Math.random());
+
 			            this.indikatorLives.appendChild(el);
 			        } else {
 						this.padajuciElement = document.createElement("div");
 						dodajStilove(this.padajuciElement, {height: "100%", width: 0.6666*this.indikatorLives.clientHeight +"px",
-				                       backgroundImage: "url('puca_prema_gore.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain",
-				                       transition: "transform 0.7s ease-in"});
+				                       transition: "transform 0.7s ease-in", position: "relative", overflow: "hidden"});
+				                      
+				        let spr = document.createElement("img"); 
+				        this.padajuciElement.appendChild(spr);
+	                    dodajStilove(spr, {position: "absolute", height: "800%", width: "300%",
+			                                       top: "16%", left: "0%", zIndex: "10"});
+	                    spr.setAttribute("src", "sprite.png");
+	                     
+				        
+				        console.log("trebao bi vidjeti ikonu1..." + Math.random());
+				        
 			            this.indikatorLives.appendChild(this.padajuciElement);
 					}
 		        } 
@@ -136,8 +155,18 @@ class Indikatori {
 			    //let el = document.createElement("div");
 			    this.padajuciElement = document.createElement("div");
 			    dodajStilove(this.padajuciElement, {height: "100%", width: 0.6666*this.indikatorLives.clientHeight +"px",
-				                   backgroundImage: "url('puca_prema_gore.svg')", backgroundRepeat: "no-repeat", backgroundSize: "contain",
-				                   transition: "transform 0.7s ease-in"});
+				                   transition: "transform 0.7s ease-in", overflow: "hidden", position: "relative"});
+				
+				let spr = document.createElement("img"); 
+				this.padajuciElement.appendChild(spr); 
+	            dodajStilove(spr, {position: "absolute", height: "800%", width: "300%",
+			                       top: "16%", left: "0%", zIndex: "10"});
+	            spr.setAttribute("src", "sprite.png");
+	            
+				        
+				console.log("trebao bi vidjeti ikonu2..." + Math.random());
+				
+				
 			    this.indikatorLives.appendChild(this.padajuciElement);
 			    let el = document.createElement("p");
 		        el.innerHTML = "X " + this.lives;
