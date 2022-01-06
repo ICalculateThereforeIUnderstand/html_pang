@@ -53,7 +53,7 @@ class Engine {
 	    this.iteracije = this.iteracije.bind(this);
 	    this.ubacujLopte = this.ubacujLopte.bind(this);
 	    
-	    this.igr = new Igrac({vis: 110, sir: 70, x: sirina/2-35, brzinaKretanja: 200, vidljiv: false});
+	    this.igr = new Igrac({vis: 110, sir: 70, x: sirina/2-35, brzinaKretanja: 200, vidljiv: false, vFrame: 200/14.5});  // odnos brzineKretanja i vFrame treba biti oko 14.5
 	    this.kontrole = new Kontrole({igracObjekt: this.igr, oruzjeObjekt: this.oruzje, engine: this});
 	    this.zvukLostLife = new Zvuk({file: "zvuk1.mp3", brOverlap: 1, volume:1.0});	
 	    this.zvukGameOver = new Zvuk({file: "zvuk2.mp3", brOverlap: 1, volume:1.0});	
@@ -389,7 +389,8 @@ class Oruzje {
 }
 
 class Igrac {
-	constructor({vis, sir, x, brzinaKretanja=130, g=700, vidljiv=true}) {
+	constructor({vis, sir, x, brzinaKretanja=130, g=700, vidljiv=true, vFrame=10}) {
+		// vFrame je broj frameova po sekundi
 		this.visina = vis;
 		this.sirina = sir;
 		this.g = g;
@@ -398,7 +399,12 @@ class Igrac {
 		this.vidljivSw = vidljiv;
 		
 		this.time = null; //performance.now();
+		this.pocetnoVrijemeAnim = null;
+		this.frame = 0;
+		this.pocFrame = null;
+		this.vFrame = vFrame;
 		this.smjerKretanja = null;             // za null igrac stoji, za "l"/"d" igrac se krece lijevo/desno
+		this.smjerKretanjaPrethodni = null;
 		this.brzinaKretanja = brzinaKretanja;  // brzina kretanja u pikselima po sekundi
 		this.stranaPucaljke = "l";             // za l/d pucaljka igraca se nalazi na lijevoj/desnoj strani
 		
@@ -408,7 +414,7 @@ class Igrac {
 		this.el.id = this.id;
 		
 		dodajStilove(this.el, {height: this.visina + "px", width: this.sirina + "px", position: "absolute", backgroundColor: "white",
-			                  bottom: "0px", left: (this.x - this.sirina/2) + "px"});
+			                  bottom: "0px", left: (this.x - this.sirina/2) + "px", overflow: "hidden"});
 	    if (!this.vidljivSw)  dodajStilove(this.el, {display: "none"});
 			                  
 		this.glava = document.createElement("div");			
@@ -441,8 +447,11 @@ class Igrac {
 			                  top: "0px", left: 0.2*this.sirina + "px", zIndex: "3"});
 		this.el.appendChild(this.pucaljka);
 			                  
-	    //dodajStilove(this.pucaljka, {left: null, right: 0.2*this.sirina + "px"});  //  nacin kako tokom igre mjenjati poziciju pucaljke lijevo/desno
-	    //dodajStilove(this.pucaljka, {right: null, left: 0.2*this.sirina + "px"});
+        this.sprite = document.createElement("img"); 
+	    dodajStilove(this.sprite, {position: "absolute", height: "800%", width: "300%",
+			                    top: "5%", left: "0%", zIndex: "6"});
+	    this.sprite.setAttribute("src", "sprite.png");
+	    this.el.appendChild(this.sprite);
 	    
 		document.querySelector(".display").appendChild(this.el);
 		
@@ -560,12 +569,19 @@ class Igrac {
 		if (this.time === null) {
 			var dt = 0;
 			this.time = vrijeme;
+			this.pocetnoVrijemeAnim = vrijeme;
+			this.pocFrame = 0;
 		} else {
 			var dt = vrijeme - this.time;
 			this.time = vrijeme;
 		}
 		
 		if (this.smjerKretanja !== null) {
+			if (false && this.smjerKretanja !== this.smjerKretanjaPrethodni) {
+			    this.smjerKretanjaPrethodni = this.smjerKretanja;
+			    this.pocFrame = 0;
+		    }
+			
 		    var noviX = this.x;
 		    if (this.smjerKretanja === "l") {
 				if (this.stranaPucaljke !== "l") {
@@ -573,21 +589,34 @@ class Igrac {
 					dodajStilove(this.pucaljka, {right: null, left: 0.2*this.sirina + "px"});
 				}
 			    noviX -= this.brzinaKretanja * dt / 1000; 
+			    this.frame = Math.round(this.pocFrame + (this.time - this.pocetnoVrijemeAnim) / 1000 * this.vFrame) % 8;
 			    if (noviX < this.sirina/2) noviX = this.sirina/2;
+			    
+			    if (this.x !== noviX) {
+					this.x = noviX;
+			        dodajStilove(this.el, {left: (this.x - this.sirina/2) + "px"});
+			        dodajStilove(this.sprite, {top: -1*Math.floor(this.frame/3)*100 - 300 + 5 + "%", left: -1*(this.frame%3)*100 + "%"});
+				}
+			 
 		    } else if (this.smjerKretanja === "d") {
 				if (this.stranaPucaljke !== "d") {
 					this.stranaPucaljke = "d";
 					dodajStilove(this.pucaljka, {left: null, right: 0.2*this.sirina + "px"});
 				}
 			    noviX += this.brzinaKretanja * dt / 1000;
+			    this.frame = Math.round(this.pocFrame + (this.time - this.pocetnoVrijemeAnim) / 1000 * this.vFrame) % 8;
 			    if (noviX > sirina - this.sirina/2)  noviX = sirina - this.sirina/2;
+			    
+			    if (this.x !== noviX) {
+					this.x = noviX;
+			        dodajStilove(this.el, {left: (this.x - this.sirina/2) + "px"});
+			        dodajStilove(this.sprite, {top: -1*Math.floor(this.frame/3)*100 + 5 + "%", left: -1*(this.frame%3)*100 + "%"});
+				}   
 		    }
-		    
-		    if (this.x !== noviX) {
-			    this.x = noviX;
-			    dodajStilove(this.el, {left: (this.x - this.sirina/2) + "px"});
-		    }
-	    }
+	    } else {  // this.smjerKretanja == null, resetiramo pocetno vrijeme animacije
+			this.pocetnoVrijemeAnim = vrijeme;
+			this.pocFrame = this.frame;
+		}
 	  }  
 	}
 }
