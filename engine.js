@@ -406,51 +406,51 @@ class Igrac {
 		this.smjerKretanja = null;             // za null igrac stoji, za "l"/"d" igrac se krece lijevo/desno
 		this.smjerKretanjaPrethodni = null;
 		this.brzinaKretanja = brzinaKretanja;  // brzina kretanja u pikselima po sekundi
-		this.stranaPucaljke = "l";             // za l/d pucaljka igraca se nalazi na lijevoj/desnoj strani
+		this.stranaPucaljke = "d";             // za l/d pucaljka igraca se nalazi na lijevoj/desnoj strani
 		
 		this.liveLost = false;
 		this.el = document.createElement("div");			
 		this.id = "igrac";
 		this.el.id = this.id;
 		
-		dodajStilove(this.el, {height: this.visina + "px", width: this.sirina + "px", position: "absolute", backgroundColor: "white",
+		if (false) {
+			var backgro = "white";
+			var disp = "block";
+		} else {
+			var backgro = "transparent";
+			var disp = "none";
+		}
+		
+		dodajStilove(this.el, {height: this.visina + "px", width: this.sirina + "px", position: "absolute", backgroundColor: backgro,
 			                  bottom: "0px", left: (this.x - this.sirina/2) + "px", overflow: "hidden"});
 	    if (!this.vidljivSw)  dodajStilove(this.el, {display: "none"});
 			                  
 		this.glava = document.createElement("div");			
 		this.glava.id = "glava";
-		dodajStilove(this.glava, {height: 0.7*this.sirina + "px", width: 0.7*this.sirina + "px", backgroundColor: "#0596f0", position: "absolute",
-			                  top: 0.1*this.sirina + "px", left: 0.15*this.sirina + "px", borderRadius: "50%", zIndex: "5"});
+		/*dodajStilove(this.glava, {height: 0.7*this.sirina + "px", width: 0.7*this.sirina + "px", backgroundColor: "#0596f0", position: "absolute",
+			                  top: 0.1*this.sirina + "px", left: 0.15*this.sirina + "px", borderRadius: "50%", zIndex: "5"});*/
+	    dodajStilove(this.glava, {height: 0.4*this.sirina + "px", width: 0.4*this.sirina + "px", backgroundColor: "#0596f0", position: "absolute",
+			                  top: 0.35*this.sirina + "px", left: 0.3*this.sirina + "px", borderRadius: "50%", zIndex: "5", display: disp});
 		this.el.appendChild(this.glava);
 		
+			
 		this.tijelo = document.createElement("div");			
 		this.tijelo.id = "tijelo";
-		dodajStilove(this.tijelo, {height: 0.8*this.sirina + "px", width: 0.8*this.sirina + "px", backgroundColor: "blue", position: "absolute",
-			                  top: 0.55*this.sirina + "px", left: 0.1*this.sirina + "px", zIndex: "4"});
+		dodajStilove(this.tijelo, {height: 1.0*this.sirina + "px", width: 0.5*this.sirina + "px", backgroundColor: "blue", position: "absolute",
+			                  top: 0.6*this.sirina + "px", left: 0.25*this.sirina + "px", zIndex: "4", display: disp});
 		this.el.appendChild(this.tijelo);
 		
-		var el1 = document.createElement("div");			
-		el1.id = "noga1";
-		dodajStilove(el1, {height: 0.5*this.sirina + "px", width: 0.2*this.sirina + "px", backgroundColor: "#ecbcb4", position: "absolute",
-			                  bottom: "0px", left: 0.2*this.sirina + "px", zIndex: "3"});
-		this.el.appendChild(el1);
-		
-		el1 = document.createElement("div");			
-		el1.id = "noga2";
-		dodajStilove(el1, {height: 0.5*this.sirina + "px", width: 0.2*this.sirina + "px", backgroundColor: "#ecbcb4", position: "absolute",
-			                  bottom: "0px", right: 0.2*this.sirina + "px", zIndex: "3"});
-		this.el.appendChild(el1);
-		
+				
 	    this.pucaljka = document.createElement("div");			
 		this.pucaljka.id = "pucaljka";
 		dodajStilove(this.pucaljka, {height: 1.0*this.sirina + "px", width: 0.25*this.sirina + "px", backgroundColor: "black", position: "absolute",
-			                  top: "0px", left: 0.2*this.sirina + "px", zIndex: "3"});
+			                  top: "0px", left: 0.2*this.sirina + "px", zIndex: "3", display: disp});
 		this.el.appendChild(this.pucaljka);
 			                  
         this.sprite = document.createElement("img"); 
 	    dodajStilove(this.sprite, {position: "absolute", height: "800%", width: "300%",
 			                    top: "16%", left: "0%", zIndex: "6"});
-	    this.sprite.setAttribute("src", "sprite.png");
+	    this.sprite.setAttribute("src", "sprite1.png");
 	    this.el.appendChild(this.sprite);
 	    
 		document.querySelector(".display").appendChild(this.el);
@@ -500,11 +500,9 @@ class Igrac {
 	
 	vratiPolozajPucaljke() {
 		if (this.stranaPucaljke === "l") {
-			console.log("aa " + 0.2*this.sirina);
-			return this.x - this.sirina/2 + 0.2*this.sirina + 0.125*this.sirina;
+			return this.x - 0.12 * this.sirina;
 		} else {
-			console.log("bb " + 0.55*this.sirina);
-			return this.x - this.sirina/2 + 0.55*this.sirina + 0.125*this.sirina;
+			return this.x + 0.12 * this.sirina;
 		}
 	}
 	
@@ -515,7 +513,11 @@ class Igrac {
 		    if (this.time === null) {
 			    var dt = 0;
 			    this.time = vrijeme;
-	            //this.pocetnoVrijeme = vrijeme;
+			    if (this.vx > 0) {
+	                dodajStilove(this.sprite, {top: -600 + 16 + "%", left: -200 - 7 + "%"});
+	            } else {
+					dodajStilove(this.sprite, {top: -700 + 16 + "%", left: 0 - 7 + "%"});
+				}
 		    } else {
 			    var dt = vrijeme - this.time;
 			    this.time = vrijeme;
@@ -544,6 +546,7 @@ class Igrac {
 	    } else if (this.faza == 2) { //faza letenja od trenutka udara igraca u zid
 			if (this.y > visina + 200) {
 				dodajStilove(this.el, {display: "none"});
+				dodajStilove(this.sprite, {top: "16%", left: "0%", zIndex: "6"});
 				this.vidljivSw = false;
 				return false;
 			}
