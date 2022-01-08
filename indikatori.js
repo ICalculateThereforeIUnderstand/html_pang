@@ -146,7 +146,6 @@ class Indikatori {
 					}
 		        } 
 		    } else {
-			    //let el = document.createElement("div");
 			    this.padajuciElement = document.createElement("div");
 			    dodajStilove(this.padajuciElement, {height: "100%", width: 0.6666*this.indikatorLives.clientHeight +"px",
 				                   transition: "transform 0.7s ease-in", overflow: "hidden", position: "relative"});
@@ -156,10 +155,6 @@ class Indikatori {
 	            dodajStilove(spr, {position: "absolute", height: "1600%", width: "600%",
 			                       top: "16%", left: "0%", zIndex: "10"});
 	            spr.setAttribute("src", "sprite.png");
-	            
-				        
-				console.log("trebao bi vidjeti ikonu2..." + Math.random());
-				
 				
 			    this.indikatorLives.appendChild(this.padajuciElement);
 			    let el = document.createElement("p");
