@@ -448,9 +448,9 @@ class Igrac {
 		this.el.appendChild(this.pucaljka);
 			                  
         this.sprite = document.createElement("img"); 
-	    dodajStilove(this.sprite, {position: "absolute", height: "800%", width: "300%",
+	    dodajStilove(this.sprite, {position: "absolute", height: "1600%", width: "600%",
 			                    top: "16%", left: "0%", zIndex: "6"});
-	    this.sprite.setAttribute("src", "sprite1.png");
+	    this.sprite.setAttribute("src", "sprite.png");
 	    this.el.appendChild(this.sprite);
 	    
 		document.querySelector(".display").appendChild(this.el);
@@ -514,9 +514,11 @@ class Igrac {
 			    var dt = 0;
 			    this.time = vrijeme;
 			    if (this.vx > 0) {
-	                dodajStilove(this.sprite, {top: -600 + 16 + "%", left: -200 - 7 + "%"});
+	                //dodajStilove(this.sprite, {top: -600 + 16 + "%", left: -200 - 7 + "%"});
+	                dodajStilove(this.sprite, {top: -1200 + 16 + "%", left: -400 - 7 + "%"});
 	            } else {
-					dodajStilove(this.sprite, {top: -700 + 16 + "%", left: 0 - 7 + "%"});
+					//dodajStilove(this.sprite, {top: -700 + 16 + "%", left: 0 - 7 + "%"});
+					dodajStilove(this.sprite, {top: -1400 + 16 + "%", left: 0 - 7 + "%"});
 				}
 		    } else {
 			    var dt = vrijeme - this.time;
@@ -598,7 +600,8 @@ class Igrac {
 			    if (this.x !== noviX) {
 					this.x = noviX;
 			        dodajStilove(this.el, {left: (this.x - this.sirina/2) + "px"});
-			        dodajStilove(this.sprite, {top: -1*Math.floor(this.frame/3)*100 - 300 + 16 + "%", left: -1*(this.frame%3)*100 - 7 + "%"});
+			        //dodajStilove(this.sprite, {top: -1*Math.floor(this.frame/3)*100 - 300 + 16 + "%", left: -1*(this.frame%3)*100 - 7 + "%"});
+			        dodajStilove(this.sprite, {top: -2*Math.floor(this.frame/3)*100 - 600 + 16 + "%", left: -2*(this.frame%3)*100 - 7 + "%"});
 				}
 			 
 		    } else if (this.smjerKretanja === "d") {
@@ -613,16 +616,19 @@ class Igrac {
 			    if (this.x !== noviX) {
 					this.x = noviX;
 			        dodajStilove(this.el, {left: (this.x - this.sirina/2) + "px"});
-			        dodajStilove(this.sprite, {top: -1*Math.floor(this.frame/3)*100 + 16 + "%", left: -1*(this.frame%3)*100 + 7 + "%"});
+			        //dodajStilove(this.sprite, {top: -1*Math.floor(this.frame/3)*100 + 16 + "%", left: -1*(this.frame%3)*100 + 7 + "%"});
+			        dodajStilove(this.sprite, {top: -2*Math.floor(this.frame/3)*100 + 16 + "%", left: -2*(this.frame%3)*100 + 7 + "%"});
 				}   
 		    }
 	    } else {  // this.smjerKretanja == null, resetiramo pocetno vrijeme animacije
 			this.pocetnoVrijemeAnim = vrijeme;
 			this.pocFrame = this.frame;
 			if (this.smjerKretanjaPrethodni === "l") {
-			    dodajStilove(this.sprite, {top: -600 + 16 + "%", left: "8%"});
+			    //dodajStilove(this.sprite, {top: -600 + 16 + "%", left: "8%"});
+			    dodajStilove(this.sprite, {top: -1200 + 16 + "%", left: "8%"});
 			} else {
-				dodajStilove(this.sprite, {top: -600 + 16 + "%", left: "-108%"});
+				//dodajStilove(this.sprite, {top: -600 + 16 + "%", left: "-108%"});
+				dodajStilove(this.sprite, {top: -1200 + 16 + "%", left: "-208%"});
 			}
 		}
 	  }  

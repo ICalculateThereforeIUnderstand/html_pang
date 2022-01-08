@@ -126,12 +126,9 @@ class Indikatori {
 				        
 				        let spr = document.createElement("img"); 
 				        el.appendChild(spr);
-	                    dodajStilove(spr, {position: "absolute", height: "800%", width: "300%",
+	                    dodajStilove(spr, {position: "absolute", height: "1600%", width: "600%",
 			                                       top: "16%", left: "0%", zIndex: "10"});
 	                    spr.setAttribute("src", "sprite.png");
-	                    
-				        
-				        console.log("trebao bi vidjeti ikonu..." + Math.random());
 
 			            this.indikatorLives.appendChild(el);
 			        } else {
@@ -141,13 +138,10 @@ class Indikatori {
 				                      
 				        let spr = document.createElement("img"); 
 				        this.padajuciElement.appendChild(spr);
-	                    dodajStilove(spr, {position: "absolute", height: "800%", width: "300%",
+	                    dodajStilove(spr, {position: "absolute", height: "1600%", width: "600%",
 			                                       top: "16%", left: "0%", zIndex: "10"});
 	                    spr.setAttribute("src", "sprite.png");
-	                     
-				        
-				        console.log("trebao bi vidjeti ikonu1..." + Math.random());
-				        
+	                        
 			            this.indikatorLives.appendChild(this.padajuciElement);
 					}
 		        } 
@@ -159,7 +153,7 @@ class Indikatori {
 				
 				let spr = document.createElement("img"); 
 				this.padajuciElement.appendChild(spr); 
-	            dodajStilove(spr, {position: "absolute", height: "800%", width: "300%",
+	            dodajStilove(spr, {position: "absolute", height: "1600%", width: "600%",
 			                       top: "16%", left: "0%", zIndex: "10"});
 	            spr.setAttribute("src", "sprite.png");
 	            
