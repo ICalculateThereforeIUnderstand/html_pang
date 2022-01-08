@@ -14,7 +14,7 @@
 #porukaaa #poruka-tekstaa {
   font-family: sans-serif;
   font-size: 30px;
-  font-width: 600;
+  /*font-weight: 600;*/
   color: #36eb1e;
 }
 
@@ -35,7 +35,7 @@
 #poruka1-teksta {
   font-family: sans-serif;
   font-size: 40px;
-  font-width: 600;
+  /*font-weight: 600;*/
   color: #11d6f0;
 }
 

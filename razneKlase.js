@@ -189,10 +189,9 @@ export class StartajIgru {
 	}
 	
 	proces(prviStartSw=true) {
-		//console.log("procesiram " + this.brojac);
 		if (this.brojac === 0) {
 			this.brojac++;
-			setTimeout( ()=> {console.log("1procesiram " + this.brojac); this.proces(prviStartSw)}, 1000);
+			setTimeout( ()=> {this.proces(prviStartSw)}, 1000);
 		} else if (this.brojac < 11) {
 			if (this.brojac % 2 == 0) {
 				dodajStilove(this.el, {display: "none"});
@@ -200,11 +199,10 @@ export class StartajIgru {
 				dodajStilove(this.el, {display: "flex"});
 			}
 			this.brojac++;
-			setTimeout( ()=> {/*console.log("1procesiram " + this.brojac);*/ this.proces(prviStartSw)}, 250);
+			setTimeout( ()=> { this.proces(prviStartSw)}, 250);
 		} else {
 			this.muzika.sviraj();
 	        if (prviStartSw) {
-				//engine();
 				this.engine.engine();
 			} else {
 				this.engine.iteracije();
@@ -222,8 +220,6 @@ export class StartajIgru {
 	    
 	    document.querySelector("#poruka1-tekst").innerHTML = "READY";
 	    this.proces();
-	    /*muzika.sviraj();
-	    engine();*/
     }
     
     startajPonovo() {
@@ -236,7 +232,6 @@ export class StartajIgru {
 		document.querySelector("#poruka1-tekst").innerHTML = "GAME OVER";
 		dodajStilove(this.el, {display: "flex"});
 		setTimeout(()=>{
-			//dodajStilove(this.el, {display: "none"});
 			document.querySelector("#poruka1-tekst").innerHTML = "CLICK TO START";
 			this.startaj();
 			
