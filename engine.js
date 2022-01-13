@@ -72,6 +72,7 @@ class Engine {
 	    this.indikatori.setLives(this.brLives);
 	    this.indikatori.setProgres(this.progres/16*100);
 	    this.indikatori.setLevel(this.level);
+	    this.indikatori.setBackground(this.level);
 	
 	    this.poljeLopti = [];	
 	    this.poljeEksplozija = [];
@@ -193,6 +194,7 @@ class Engine {
 	    
 	        if (this.progres >= 17) {
 			    this.level += Math.floor(this.progres / 17);
+			    this.indikatori.setBackground(this.level);
 			    this.progres = this.progres % 17;
 		    }
 		    this.indikatori.setProgres(this.progres/16*100);
