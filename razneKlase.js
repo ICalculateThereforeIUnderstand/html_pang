@@ -19,7 +19,7 @@ export class LeteciBroj {
                                alignItems: "center"});
         
         let el1 = document.createElement("p");
-        dodajStilove(el1, {fontFamily: "sans-serif", fontSize: "15px", fontWidth: "800", color: "#4bf542"});
+        dodajStilove(el1, {fontFamily: "sans-serif", fontSize: "17px", fontWeight: "600", color: "#065c02"}); 
         el1.innerHTML = this.broj + "";
         this.el.appendChild(el1);
         

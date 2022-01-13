@@ -1,6 +1,6 @@
 const bojaCigle = "blue";
 const bojaCementa = "#444444";
-const bojaDisplaya = "#555555";
+const bojaDisplaya = "#999999";
 
 
 function inicijalizirajDisplay(visina, sirina, sirinaOkvira) {
@@ -79,7 +79,7 @@ function inicijalizirajDisplay(visina, sirina, sirinaOkvira) {
     dodajStilove(el6, {height: "100px", width: "200px", position: "absolute", top: "250px", left: "350px", display: "flex", alignItems: "center", justifyContent: "center", zIndex: "9", display: "none"});
     let el7 = document.createElement("p");
     el7.id = "poruka-tekst";
-    dodajStilove(el7, {fontFamily: "sans-serif", fontSize: "30px", fontWidth: "600", color: "#36eb1e"});
+    dodajStilove(el7, {fontFamily: "sans-serif", fontSize: "30px", fontWidth: "600", color: "#065c02"});
     el7.innerHTML = "Last 1s.";
     el6.appendChild(el7);
     
@@ -89,7 +89,7 @@ function inicijalizirajDisplay(visina, sirina, sirinaOkvira) {
     el8.id = "poruka1";
     dodajStilove(el8, {height: "100px", width: "400px", position: "absolute", top: "250px", left: "250px", display: "flex", alignItems: "center", justifyContent: "center", zIndex: "9"});
     let el9 = document.createElement("p");
-    dodajStilove(el9, {fontFamily: "sans-serif", fontSize: "40px", fontWidth: "600", color: "#11d6f0"});
+    dodajStilove(el9, {fontFamily: "sans-serif", fontSize: "40px", fontWidth: "600", color: "#065c02"});  
     el9.id = "poruka1-tekst";
     el9.innerHTML = "CLICK TO START";
     el8.appendChild(el9);

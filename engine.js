@@ -61,7 +61,7 @@ class Engine {
 	engine() {
 		this.engineAktivanSw = true;
 	    this.bodovi = 0;
-	    this.brLives = 8;
+	    this.brLives = 3;
 	    this.progres = 0;
 	    this.level = 1;
 	    this.zadnjaPonistena = -1;
@@ -72,6 +72,7 @@ class Engine {
 	    this.indikatori.setLives(this.brLives);
 	    this.indikatori.setProgres(this.progres/16*100);
 	    this.indikatori.setLevel(this.level);
+	    this.indikatori.setBackground(this.level);
 	
 	    this.poljeLopti = [];	
 	    this.poljeEksplozija = [];
@@ -193,6 +194,7 @@ class Engine {
 	    
 	        if (this.progres >= 17) {
 			    this.level += Math.floor(this.progres / 17);
+			    this.indikatori.setBackground(this.level);
 			    this.progres = this.progres % 17;
 		    }
 		    this.indikatori.setProgres(this.progres/16*100);
@@ -245,14 +247,14 @@ class Engine {
 	    let loptaTip = Math.floor(Math.random()*3)+1;
 	    let sestkutSw = Math.random() < 0.25 ? true : false; 
 	    this.brUbacenihLopti++;
-	    if (this.brUbacenihLopti % 10 == 0) {
+	    if (this.brUbacenihLopti % 15 == 0) {
 			var l = new Lopta({size:loptaTip, vx:110 * (Math.floor(Math.random()*2) - 0.5)*2, vy:170, hMax:tip(loptaTip), x:130, y:100, g:1*700, xPoc: Math.floor(Math.random()*700 +100), inicSw: true, sesterokutSw: false, ucinak: 2}); 
 		} else {
 	        var l = new Lopta({size:loptaTip, vx:110 * (Math.floor(Math.random()*2) - 0.5)*2, vy:170, hMax:tip(loptaTip), x:130, y:100, g:1*700, xPoc: Math.floor(Math.random()*700 +100), inicSw: true, sesterokutSw: sestkutSw, ucinak: 0}); 
 	    }
 	    
 	    poljeLopti.push(l);
-	    this.ubacujLopteRef = setTimeout(() => {this.ubacujLopte(poljeLopti)}, 6000);
+	    this.ubacujLopteRef = setTimeout(() => {this.ubacujLopte(poljeLopti)}, 5000);
 	
 	    function tip(ltip) {
 		    switch (ltip) {
