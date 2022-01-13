@@ -8,6 +8,8 @@ class Indikatori {
 		this.level = level;
 		this.progres = progres;
 		this.padajuciElement = null;
+		this.display = document.querySelector(".display");
+		dodajStilove(this.display, {backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "cover"});
 		
 		var fontProperties = {fontFamily: "sans-serif", fontSize: "40px", fontWeight: "600", color: bojaSlova, lineHeight: "0"};
 		
@@ -73,6 +75,7 @@ class Indikatori {
 		this.setLevel = this.setLevel.bind(this);
 		this.setProgres = this.setProgres.bind(this);
 		this.izgubioZivot = this.izgubioZivot.bind(this);
+		this.setBackground = this.setBackground.bind(this);
 		
 		this.setLives(this.lives, true);
 		this.setBodovi(this.bodovi, true);
@@ -86,6 +89,65 @@ class Indikatori {
 		    this.progres = progres;
 		    dodajStilove(this.indikatorProgres, {left: this.progres + "%"});
 	    }
+	}
+	
+	setBackground(lev=1) {
+		switch (lev%28) {
+			case (1):
+			case (2):
+			    this.display.style.backgroundImage = 'url("./slike/zagreb.jpg")';
+			    break;
+			case (3):
+			case (4):
+			    this.display.style.backgroundImage = 'url("./slike/split.jpg")';
+			    break;
+			case (5):
+			case (6):
+			    this.display.style.backgroundImage = 'url("./slike/dubrovnik.jpg")';
+			    break;
+			case (7):
+			case (8):
+			    this.display.style.backgroundImage = 'url("./slike/pula.jpg")';
+			    break;
+			case (9):
+			case (10):
+			    this.display.style.backgroundImage = 'url("./slike/zadar.jpg")';
+			    break;
+			case (11):
+			case (12):
+			    this.display.style.backgroundImage = 'url("./slike/osijek.jpg")';
+			    break;			
+			case (13):
+			case (14):
+			    this.display.style.backgroundImage = 'url("./slike/trogir.jpg")';
+			    break;			
+			case (15):
+			case (16):
+			    this.display.style.backgroundImage = 'url("./slike/trogir.jpg")';
+			    break;
+			case (17):
+			case (18):
+			    this.display.style.backgroundImage = 'url("./slike/varazdin.jpg")';
+			    break;
+			case (19):
+			case (20):
+			    this.display.style.backgroundImage = 'url("./slike/plitvice.jpg")';
+			    break;		
+			case (21):
+			case (22):
+			    this.display.style.backgroundImage = 'url("./slike/trakoscan.jpg")';
+			    break;			
+			case (23):
+			case (24):
+			    this.display.style.backgroundImage = 'url("./slike/zagreb1.jpg")';
+			    break;			
+			case (25):
+			case (26):
+			    this.display.style.backgroundImage = 'url("./slike/trogir2.jpg")';
+			    break;			
+			case (27):
+			case (0):
+		}
 	}
 	
 	setLevel(lev=1, sw=false) {
