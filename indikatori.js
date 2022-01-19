@@ -70,17 +70,62 @@ class Indikatori {
 		
 		document.querySelector("#indikatori").appendChild(this.el);      //  u ovu komponentu ubacujem u ovaj element. On mora imati zadanu visinu i sirinu, i onda ce to biti sirina i visina moje komponente.
 		
+		// ovdje ucitavamo slike pozadine
+		
+		this.slike = [];
+		for (let i = 0; i < 13; i++) {
+		    let slika = document.createElement("img");
+		    dodajStilove(slika, {height: "100%", width: "100%", position: "absolute", top: "0px", left: "0px", display: "none"});
+		    slika.src = this.slikaUrl(i);
+		    this.display.appendChild(slika);
+		    this.slike.push(slika);
+		}
+		
 		this.setLives = this.setLives.bind(this);
 		this.setBodovi = this.setBodovi.bind(this);
 		this.setLevel = this.setLevel.bind(this);
 		this.setProgres = this.setProgres.bind(this);
 		this.izgubioZivot = this.izgubioZivot.bind(this);
 		this.setBackground = this.setBackground.bind(this);
+		this.slikaUrl = this.slikaUrl.bind(this);
 		
 		this.setLives(this.lives, true);
 		this.setBodovi(this.bodovi, true);
 		this.setProgres(this.progres, true);
 		this.setLevel(this.level, true);
+	}
+	
+	slikaUrl(br=0) {
+		switch (br) {
+			case (0):
+			    return './slike/zagreb.jpg';
+			case (1):
+			    return './slike/split.jpg';
+			case (2):
+			    return './slike/dubrovnik.jpg';
+			case (3):
+			    return './slike/pula.jpg';
+			case (4):
+			    return './slike/zadar.jpg';
+			case (5):
+			    return './slike/osijek.jpg';
+			case (6):
+			    return './slike/trogir.jpg';
+			case (7):
+			    return './slike/trogir.jpg';
+			case (8):
+			    return './slike/varazdin.jpg';
+			case (9):
+			    return './slike/plitvice.jpg';
+			case (10):
+			    return './slike/trakoscan.jpg';
+			case (11):
+			    return './slike/zagreb1.jpg';
+			case (12):
+			    return './slike/trogir2.jpg';
+			default:
+			    return './slike/zagreb.jpg';
+		}
 	}
 	
 	// sw je pomocna inicijalizacijska varijabla, van ove klase je nemoj nikada koristiti, i ako ti nije jasno cemu sluzi, nemoj je koristiti
@@ -92,58 +137,75 @@ class Indikatori {
 	}
 	
 	setBackground(lev=1) {
+		for (let i = 0; i < this.slike.length; i++) {
+			this.slike[i].style.display = "none";
+		}
+		
 		switch (lev%28) {
 			case (1):
 			case (2):
-			    this.display.style.backgroundImage = 'url("./slike/zagreb.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/zagreb.jpg")';
+			    this.slike[0].style.display = "block";
 			    break;
 			case (3):
 			case (4):
-			    this.display.style.backgroundImage = 'url("./slike/split.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/split.jpg")';
+			    this.slike[1].style.display = "block";
 			    break;
 			case (5):
 			case (6):
-			    this.display.style.backgroundImage = 'url("./slike/dubrovnik.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/dubrovnik.jpg")';
+			    this.slike[2].style.display = "block";
 			    break;
 			case (7):
 			case (8):
-			    this.display.style.backgroundImage = 'url("./slike/pula.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/pula.jpg")';
+			    this.slike[3].style.display = "block";
 			    break;
 			case (9):
 			case (10):
-			    this.display.style.backgroundImage = 'url("./slike/zadar.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/zadar.jpg")';
+			    this.slike[4].style.display = "block";
 			    break;
 			case (11):
 			case (12):
-			    this.display.style.backgroundImage = 'url("./slike/osijek.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/osijek.jpg")';
+			    this.slike[5].style.display = "block";
 			    break;			
 			case (13):
 			case (14):
-			    this.display.style.backgroundImage = 'url("./slike/trogir.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/trogir.jpg")';
+			    this.slike[6].style.display = "block";
 			    break;			
 			case (15):
 			case (16):
-			    this.display.style.backgroundImage = 'url("./slike/trogir.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/trogir.jpg")';
+			    this.slike[7].style.display = "block";
 			    break;
 			case (17):
 			case (18):
-			    this.display.style.backgroundImage = 'url("./slike/varazdin.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/varazdin.jpg")';
+			    this.slike[8].style.display = "block";
 			    break;
 			case (19):
 			case (20):
-			    this.display.style.backgroundImage = 'url("./slike/plitvice.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/plitvice.jpg")';
+			    this.slike[9].style.display = "block";
 			    break;		
 			case (21):
 			case (22):
-			    this.display.style.backgroundImage = 'url("./slike/trakoscan.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/trakoscan.jpg")';
+			    this.slike[10].style.display = "block";
 			    break;			
 			case (23):
 			case (24):
-			    this.display.style.backgroundImage = 'url("./slike/zagreb1.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/zagreb1.jpg")';
+			    this.slike[11].style.display = "block";
 			    break;			
 			case (25):
 			case (26):
-			    this.display.style.backgroundImage = 'url("./slike/trogir2.jpg")';
+			    //this.display.style.backgroundImage = 'url("./slike/trogir2.jpg")';
+			    this.slike[12].style.display = "block";
 			    break;			
 			case (27):
 			case (0):
